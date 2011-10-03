@@ -13,7 +13,27 @@
  * or the GNU Lesser General Public License version 2.1, both as
  * published by the Free Software Foundation.
  *
- * To use, telnet to the Arduino and send commands.
+ * To use, telnet to the Arduino and send commands. Commands are the 
+ * same as used for many RPG's, with a few additions. They *are* case 
+ * sensitive:
+ * 
+ * w = Accelerate forward
+ * W = Full speed forward
+ * s = Accelerate backward 
+ * S = Full speed backward
+ * a = Steer left
+ * d = Steer Right
+ * q = Stop (immediate)
+ * b = Decelerate (brake)
+ *
+ * Note that the PULSE definitions are for Vex Robotics systems. 
+ * Also note that if this is on a robot, you need either WiFi or
+ * a wireless router onboard so you can telnet to it. :)
+ *
+ * We (Section9) have great plans for an actual prototype. Initial
+ * plans are to use a wireless router. The project is called Mjolnir.
+ * See the Section9 URL above for blog updates and other plans.
+ * 
  */
  
 #include <SPI.h>

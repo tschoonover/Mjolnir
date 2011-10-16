@@ -3,6 +3,8 @@
  * This is specialized for a tank (tracked) drive with 2 motors.
  * Copyright (c) 2011 Leland Green... and Section9
  *
+ * Version: 1.e (Beta)
+ *
  * Adapted from Arduino Ethernet library example sketches
  * for Section9 (http://section9.choamco.com/)
  * By: Leland Green...     Email: aboogieman (_at_) gmail.com
@@ -44,7 +46,7 @@
 #define VEX_FULL_FORWARD 2000
 #define VEX_NEUTRAL      1500
 #define VEX_FULL_REVERSE 1000
-#define VEX_SPEED_DELTA  10
+#define VEX_SPEED_DELTA  50
 #define MOVEMENT_TIMEOUT 1000
 
 /************ ROBOT COMMAND DEFINITIONS ************/

@@ -47,7 +47,7 @@
 #define VEX_NEUTRAL      1500
 #define VEX_FULL_REVERSE 1000
 #define VEX_SPEED_DELTA  50
-#define MOVEMENT_TIMEOUT 1000
+#define MOVEMENT_TIMEOUT 2000
 
 /************ ROBOT COMMAND DEFINITIONS ************/
 #define CSTOP           'q'
@@ -57,6 +57,7 @@
 #define CRIGHT          'd'
 #define CFORWARD_FULL   'W'
 #define CREVERSE_FULL   'S'
+#define CMAINTAIN       'm'
 
 /************ PIN DEFINITIONS ************/
 #define PIN_LEFT_SERVO  2
@@ -175,6 +176,11 @@ void loop()
             updateServos();
             break;
             
+          case CMAINTAIN:
+            client.println("Maintaining current speed.");
+            lastMoveTime = millis();
+            break;
+
           default:
             client.print("Unrecognized command: ");
             client.println(c);

@@ -1,0 +1,94 @@
+SARC = Simple Arduino Robotic Control.							2012-01-12 
+
+This is specialized for a tank (tracked) drive with 2 motors.
+Copyright (c) 2011-2012 Leland Green... and Section9
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of either the GNU General Public License version 2
+or the GNU Lesser General Public License version 2.1, both as
+published by the Free Software Foundation.
+
+Written for Section9 (http://section9.choamco.com/) and 
+our future robotic overlords (http://singinst.org/)
+  By: Leland Green...     Email: aboogieman (_at_) gmail.com
+      Odysseus            Email: odysseus@choamco.com
+
+--- Disclaimer ---
+
+The usual stuff. Use this code at your own risk. It is not guaranteed, and we
+are not responsible for any damages, injuries or loss of life that results from
+it, whether direct or indirect.
+
+This code is currently in beta testing. (I just realized it doesn't even have
+a version, yet! Let's call it 0.0.1. There, now it does!) It is not production 
+quality, and some of the tools used to build it are very new technologies!
+
+--- Instructions ---
+
+This code is written to be used in Eclipse. To build it, you need the Arduino 
+Eclipse plug-in and the STL port for AVR. 
+
+I cannot support any of the following. If you have troubles with them, please
+contact their respective authors. 
+
+1. Get Eclipse installed. Any version that handles C/C++ should work fine. I'm
+	using 4.1 (Indigo). Hopefully you already have this installed - it's nice!
+
+2. Follow the instructions for installing Andy Brown's port of STL for AVR. 
+	Please read: 
+	http://andybrown.me.uk/ws/2011/01/15/the-standard-template-library-stl-for-avr-with-c-streams/
+	for usage and information, then download from his downloads page, here:
+	http://andybrown.me.uk/ws/downloads/ 
+	(At the time of this writing, a direct download link is: 
+	http://andybrown.me.uk/ws/files/avr-stl-1.1.zip 
+	However, if he has a newer version, please get that.)
+	This library is very cool! If you think so, too, please email Andy and
+	let him know.
+	 
+3. Install the Arduino plug-in for Eclipse. I'm using:
+	Arduino eclipse extensions	1.1.6	it.baeyens.arduino.feature.feature.group	jan Baeyens
+	Another great tool! To install and use it, please see this thread on the 
+	Arduino forums: 
+	http://arduino.cc/forum/index.php/topic,70547.msg589022.html#msg589022
+	
+	Please read ALL of those instructions. If you have questions or problems, 
+	please post on that thread so everyone will benefit from it.
+	
+	However, I will tell you about one glitch I encountered. When you set up a 
+	new Arduino project, you choose your target device(s). I found that mine 
+	would not build until I selected a different device and did a build-all for
+	it. Then I could switch back to the original device and build worked. (I 
+	think this may be fixed now... but just in case, keep it in mind.) 
+	
+	Also, you need to follow those instructions ***for every workspace and 
+	project*** that you create. (Some are for the entire workspace, but some
+	are for each project.)
+	
+4. Download the SARC code and add it to an Eclipse workspace. I've not actually 
+	done this. I do plan to, and will update this file with additional 
+	instructions as needed.
+
+5. After you get things imported, you may see a lot of "Problems" reported by 
+	Eclipse. Note that these do *not* get cleared when you build! You can click
+	to select them all, then hit delete to get rid of them. I'm not sure why this
+	happens, but I'll figure it out and update here. 
+	
+	This does NOT affect the build. Check the Console panel for the true 
+	results. If you see "**** Build Finished ****", you have just built SARC 
+	and you can upload using the AVR button in Eclipse. (You'll only see it in 
+	the C/C++ view.)
+	
+6. Please support Arduino and open source hardware! See Section9 for links to
+	some of our favorite geek-sites.
+
+One other great open source tool is Eclipse EGit (Git for Eclipse):
+  Eclipse EGit	1.1.0.201109151100-r	org.eclipse.egit.feature.group	Eclipse EGit
+This works great for accessing Git repositories directly from Eclipse.
+
+While I cannot support this code, I do welcome questions and feedback. I'll 
+reply as I have time. I'm a busy software engineer in my day job, as is 
+Odysseus. But we'd like to share this project, so I hope to be updating this,
+and that will include new/updated instructions. 
+
+Thanks for you interest and I hope you enjoy the project as much as we do!
+Leland Green... 						January, 2012	Battlefield, MO USA

@@ -70,10 +70,15 @@ contact their respective authors.
 
 5. After you get things imported, you may see a lot of "Problems" reported by 
 	Eclipse. Note that these do *not* get cleared when you build! You can click
-	to select them all, then hit delete to get rid of them. I'm not sure why this
-	happens, but I'll figure it out and update here. 
+	to select them all, then hit delete to get rid of them.
 	
-	This does NOT affect the build. Check the Console panel for the true 
+	*** Answer: This is, in fact, caused by the indexer. To resolve it, add the
+	appropriate header files to C/C++ General -> Indexer -> Files to index up
+	front. (I did this in the project settings and will commit this change.)
+	You do not need to include the path. For example, I just added:
+	", Arduino.h, Ethernet.h, Servo.h" (no quotes). and it cleared up.
+	
+	These messages do NOT affect the build. Check the Console panel for the true 
 	results. If you see "**** Build Finished ****", you have just built SARC 
 	and you can upload using the AVR button in Eclipse. (You'll only see it in 
 	the C/C++ view.)

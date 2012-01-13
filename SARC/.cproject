@@ -104,6 +104,7 @@
 							<tool id="it.baeyens.avreclipse.tool.avrdude.app.release.165671477" name="AVRDude" superClass="it.baeyens.avreclipse.tool.avrdude.app.release"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="it.baeyens.avreclipse.configuration.app.release.980545052.27385154" name="ReadMe.txt" rcbsApplicability="disable" resourcePath="ReadMe.txt" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry excluding="SPI|Stepper|Servo|Ethernet" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry excluding="?xamples/*" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Ethernet"/>

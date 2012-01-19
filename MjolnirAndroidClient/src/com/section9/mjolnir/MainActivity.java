@@ -1,14 +1,17 @@
 package com.section9.mjolnir;
 
-import org.openintents.sensorsimulator.hardware.Sensor;
-import org.openintents.sensorsimulator.hardware.SensorEvent;
-import org.openintents.sensorsimulator.hardware.SensorEventListener;
-import org.openintents.sensorsimulator.hardware.SensorManagerSimulator;
+//import org.openintents.sensorsimulator.hardware.Sensor;
+//import org.openintents.sensorsimulator.hardware.SensorEvent;
+//import org.openintents.sensorsimulator.hardware.SensorEventListener;
+//import org.openintents.sensorsimulator.hardware.SensorManagerSimulator;
 
 import com.section9.mjolnir.RobotModel.CameraCommands;
 
 import android.app.Activity;
-//import android.hardware.SensorManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,8 +27,8 @@ import android.widget.Toast;
  */
 public class MainActivity extends Activity {
 	
-	//private SensorManager mSensorManager;
-	private SensorManagerSimulator mSensorManager;
+	private SensorManager mSensorManager;
+	//private SensorManagerSimulator mSensorManager;
     private SensorEventListener mSensorListener;
     private RobotModel mMjolnir;
     private MjpegView mMjolnirVideo;
@@ -125,12 +128,14 @@ public class MainActivity extends Activity {
         ((Button)findViewById(R.id.ToggleConnectionButton)).setText("Disconnect");
 		
         // Init orientation sensor.
-        mSensorManager = SensorManagerSimulator.getSystemService(this, SENSOR_SERVICE);
-        mSensorManager.connectSimulator();
+        //mSensorManager = SensorManagerSimulator.getSystemService(this, SENSOR_SERVICE);
+        //mSensorManager.connectSimulator();
+        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mSensorManager.registerListener(
         	mSensorListener,
         	mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
-        	SensorManagerSimulator.SENSOR_DELAY_NORMAL
+        	//SensorManagerSimulator.SENSOR_DELAY_NORMAL
+        	SensorManager.SENSOR_DELAY_NORMAL
         );
         
         // Init video streaming.

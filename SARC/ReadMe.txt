@@ -51,6 +51,9 @@ contact their respective authors.
 	Arduino forums: 
 	http://arduino.cc/forum/index.php/topic,70547.msg589022.html#msg589022
 	
+	** Update ** Jantje has this page with easy-to-follow instructions:
+	http://www.baeyens.it/eclipse/UsethePlugin.html
+	
 	Please read ALL of those instructions. If you have questions or problems, 
 	please post on that thread so everyone will benefit from it.
 	

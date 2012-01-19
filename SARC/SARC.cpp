@@ -17,8 +17,8 @@
  * same as used for many RPG's, with a few additions. They *are* case
  * sensitive:
  *
- * w = Accelerate MotorDefs::forward
- * W = Full speed MotorDefs::forward
+ * w = Accelerate forward
+ * W = Full speed forward
  * s = Accelerate backward
  * S = Full speed backward
  * a = Steer left
@@ -35,18 +35,25 @@
  *
  */
 
-#include <iterator>
-#include <vector>
-#include <map>
-#include <pnew.cpp>
-
-#include <algorithm>
+//#include <iterator>
+//#include <vector>
+//#include <map>
+//#include <pnew.h>
+//
+//#include <algorithm>
+//
+// Do not remove the include below
+#include "SARC.h"
+#include "State.cpp"	// TODO: This is a hack. Why won't avr-gcc link to .cpp files in the project?
+//#include "State.h"
+#include "ArduinoUtils.h"
 
 #include "MotorDefs.h"
 //using namespace MotorDefs;
+#include <Arduino.h>
+#include <HardwareSerial.h>
 
-// Do not remove the include below
-#include "SARC.h"
+extern HardwareSerial Serial;
 
 /************ ROBOT COMMAND DEFINITIONS ************/
 #define CSTOP           'q'
@@ -80,7 +87,11 @@ int rightTrackSpeed = MotorDefs::neutral;
 unsigned long lastMoveTime;
 boolean isMoving = false;
 
-void setup() {
+/************ History ************/
+SARC::StateHistory *stateHistory;
+
+void setup()
+{
 	// init serial communication for debugging
 	Serial.begin(9600);
 
@@ -97,9 +108,12 @@ void setup() {
 	*server = EthernetServer(port);
 	server->begin();
 
+	// Initialize the hsistory
+	stateHistory = new SARC::StateHistory((unsigned int)500);
 }
 
-void updateServos() {
+void updateServos()
+{
 	leftTrackServo->writeMicroseconds(leftTrackSpeed);
 	rightTrackServo->writeMicroseconds(rightTrackSpeed);
 	lastMoveTime = millis();
@@ -109,6 +123,10 @@ void updateServos() {
 	else
 		isMoving = true;
 
+	// TODO: Update state with optional current heading (using compass or GPS module(s)).
+	SARC::State* currentState = new SARC::State((int)0, (unsigned long)0, (int)leftTrackSpeed, (int)rightTrackSpeed);
+	stateHistory->AddState((const SARC::State&)*currentState);
+
 	Serial.print("Left Track = ");
 	Serial.println(leftTrackSpeed);
 	Serial.print("Right Track = ");
@@ -117,7 +135,8 @@ void updateServos() {
 	Serial.println(isMoving, BIN);
 };
 
-void moveForward() {
+void moveForward()
+{
 	leftTrackSpeed = min(MotorDefs::forward,
 			leftTrackSpeed + MotorDefs::delta);
 	rightTrackSpeed = min(MotorDefs::forward,
@@ -125,7 +144,8 @@ void moveForward() {
 	updateServos();
 }
 
-void moveBackward() {
+void moveBackward()
+{
 	leftTrackSpeed = max(MotorDefs::reverse,
 			leftTrackSpeed - MotorDefs::delta);
 	rightTrackSpeed = max(MotorDefs::reverse,
@@ -133,7 +153,8 @@ void moveBackward() {
 	updateServos();
 }
 
-void turnLeft() {
+void turnLeft()
+{
 	leftTrackSpeed = max(MotorDefs::reverse,
 			leftTrackSpeed - MotorDefs::delta);
 	rightTrackSpeed = min(MotorDefs::forward,
@@ -141,7 +162,8 @@ void turnLeft() {
 	updateServos();
 }
 
-void turnRight() {
+void turnRight()
+{
 	leftTrackSpeed = min(MotorDefs::forward,
 			leftTrackSpeed + MotorDefs::delta);
 	rightTrackSpeed = max(MotorDefs::reverse,
@@ -149,13 +171,15 @@ void turnRight() {
 	updateServos();
 }
 
-void stopMovement() {
+void stopMovement()
+{
 	leftTrackSpeed = MotorDefs::neutral;
 	rightTrackSpeed = MotorDefs::neutral;
 	updateServos();
 }
 
-void loop() {
+void loop()
+{
 	// output debug info
 	Serial.println("Waiting for client...");
 

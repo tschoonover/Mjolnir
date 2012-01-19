@@ -6,8 +6,15 @@
 
 #ifndef SARC_H_
 #define SARC_H_
-#include "Arduino.h"
+//#include <Arduino.h>
 //add your includes for the project SARC here
+#include <iterator>
+#include <vector>
+#include <map>
+#include <pnew.h>
+
+#include <algorithm>
+
 
 #include <Ethernet.h>
 #include <Servo.h>

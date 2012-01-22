@@ -14,6 +14,7 @@ RM := rm -rf
 -include LiquidCrystal/subdir.mk
 -include Ethernet/utility/subdir.mk
 -include Ethernet/subdir.mk
+-include AFMotor/subdir.mk
 -include subdir.mk
 -include objects.mk
 

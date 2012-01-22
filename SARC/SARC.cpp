@@ -100,13 +100,13 @@ void setup()
 	rightTrackServo->attach((int) PIN_RIGHT_SERVO);
 
 	// init ethernet shield
-	display->PrintLine("Initializing ethernet.");
+	display->PrintLine("Init ethernet.");
 	Ethernet.begin(mac, ip, gateway, subnet);
 	*server = EthernetServer(port);
 	server->begin();
 
 	// Initialize the hsistory
-	stateHistory = new SARC::StateHistory((unsigned int)500);
+	stateHistory = new SARC::StateHistory((unsigned int)MAX_HISTORY);
 }
 
 void updateServos()
@@ -178,7 +178,7 @@ void stopMovement()
 void loop()
 {
 	// output debug info
-	display->PrintLine("Waiting for client...");
+	display->PrintLine("Waiting for client");
 
 	// check for an incoming client
 	EthernetClient client = server->available();
@@ -187,7 +187,7 @@ void loop()
 	if (client) {
 
 		// output debug info
-		display->PrintLine("EthernetClient acquired...");
+		display->PrintLine("Net Client acquired");
 
 		// echo valid commands to user
 		client.println("Movement commands:");
@@ -201,11 +201,11 @@ void loop()
 		client.println("Full Reverse - S");
 
 		// process user input as long as connection persits
-		while (client.connected()) {
-
+		while (client.connected())
+		{
 			// check for user input
-			if (client.available()) {
-
+			if (client.available())
+			{
 				// read the next character from the input buffer
 				char c = client.read();
 
@@ -214,52 +214,54 @@ void loop()
 				display->Print(c);
 
 				// process command
-				switch (c) {
-				case CSTOP:
-					client.println("Full Stop");
-					stopMovement();
-					break;
+				switch (c)
+				{
+					case CSTOP:
+						client.println("Full Stop");
+						stopMovement();
+						break;
 
-				case CFORWARD:
-					client.println("Accelerating Forward.");
-					moveForward();
-					break;
+					case CFORWARD:
+						client.println("Accelerating Forward.");
+						moveForward();
+						break;
 
-				case CREVERSE:
-					client.println("Accelerating backward.");
-					moveBackward();
-					break;
+					case CREVERSE:
+						client.println("Accelerating backward.");
+						moveBackward();
+						break;
 
-				case CLEFT:
-					client.println("Turning left.");
-					turnLeft();
-					break;
+					case CLEFT:
+						client.println("Turning left.");
+						turnLeft();
+						break;
 
-				case CRIGHT:
-					client.println("Turning right.");
-					turnRight();
-					break;
+					case CRIGHT:
+						client.println("Turning right.");
+						turnRight();
+						break;
 
-				case CFORWARD_FULL:
-					client.println("Full speed ahead!");
-					leftTrackSpeed = MotorDefs::forward;
-					rightTrackSpeed = MotorDefs::forward;
-					updateServos();
-					break;
+					case CFORWARD_FULL:
+						client.println("Full speed ahead!");
+						leftTrackSpeed = MotorDefs::forward;
+						rightTrackSpeed = MotorDefs::forward;
+						updateServos();
+						break;
 
-				case CREVERSE_FULL:
-					client.println("Full speed MotorDefs::reverse!");
-					leftTrackSpeed = MotorDefs::reverse;
-					rightTrackSpeed = MotorDefs::reverse;
-					updateServos();
-					break;
+					case CREVERSE_FULL:
+						client.println("Full speed reverse!");
+						leftTrackSpeed = MotorDefs::reverse;
+						rightTrackSpeed = MotorDefs::reverse;
+						updateServos();
+						break;
 
-				default:
-					client.print("Unrecognized command: ");
-					client.println(c);
-					break;
+					default:
+						client.print("Unrecognized command: ");
+						client.println(c);
+						break;
 				}
-			} else // no input from user to process
+			}
+		 else // no input from user to process
 			{
 				// stop movement if movement time limit exceeded
 				if (isMoving) {

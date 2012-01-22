@@ -84,6 +84,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>AFMotor</name>
+			<type>2</type>
+			<locationURI>SARCAFMotor/AFMotor</locationURI>
+		</link>
+		<link>
 			<name>Ethernet</name>
 			<type>2</type>
 			<locationURI>SARCEthernet/Ethernet</locationURI>

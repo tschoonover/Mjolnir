@@ -38,4 +38,5 @@ SPI \
 LiquidCrystal \
 Ethernet/utility \
 Ethernet \
+AFMotor \
 

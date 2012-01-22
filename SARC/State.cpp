@@ -24,9 +24,8 @@
 #include <iterator>
 #include <vector>
 //#include <map>
-#include <pnew.cpp> // This is a little kludgy, but I've certainly done worse.
+#include <pnew.cpp>
 
-#define STATE_C_
 #include "State.h"
 #include "MotorDefs.h"
 #include "ArduinoUtils.h"
@@ -36,7 +35,6 @@
 #define MAX_HISTORY 500
 #endif
 
-//using namespace MotorDefs;
 
 namespace SARC {
 
@@ -178,4 +176,4 @@ State* StateFactory::OppositeDirection (State& ref_state)
 };
 
 } // namespace SARC
-#undef STATE_C_
+

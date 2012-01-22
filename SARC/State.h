@@ -35,7 +35,7 @@ public:
 	// Returns the difference between left and right speeds as a signed long.
 	// We don't care what this value is, we only want the magnitude. This
 	// is used by the StateHistory class (below).
-	long getYaw(void);
+	long getYaw(void); // TODO: Implement
 
 	// For equality, we only compare the direction and speed(s) - not duration.
 	bool operator==(const State& state);

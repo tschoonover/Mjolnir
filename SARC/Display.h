@@ -2,22 +2,23 @@
  * Display.h
  *
  *  Created on: Jan 21, 2012
- *      Author: Leland
+ *      Author: Leland Green
  */
 
 #ifndef DISPLAY_H_
 #define DISPLAY_H_
 
-#define USE_LCD
+#include "WString.h"
+#include "Print.h"
 
-#include <LiquidCrystal.h>
+#define USE_LCD
 
 /* Use LCD_IS_SERIAL if you have a serial LCD. Right now, we only support this model:
  * 	http://www.jameco.com/webapp/wcs/stores/servlet/Product_10001_10001_2118686_-1
  * (Although, in theory, any model by that manufacturer will work.)
  * Just connect voltage, ground and the Arduino TX to your LCD RX.
  */
-//#define LCD_IS_SERIAL
+#define LCD_IS_SERIAL
 
 //#define LCD_USE_8_PINS	// Not sure why you'd want to do this, but we support it.
 //#define LCD_USE_RW		// RW mode is not supported at this time.
@@ -31,6 +32,8 @@
 #define LCD_COLUMN_COUNT	20
 
 #else // Not LCD_IS_SERIAL
+
+#include <LiquidCrystal.h>
 
 #define LCD_ROW_COUNT		2		// TODO: Implement merge of this with same mnemonic above.
 #define LCD_COLUMN_COUNT	20		// TODO: And this one.
@@ -77,7 +80,7 @@ public:
 	void On(void);
 	void Off(void);
 	void SetCursor(uint8_t row, uint8_t col);
-	void AutoScroll(void);
+//	void AutoScroll(void);	// TODO: Do we need this?
 
     void Print(const String &);
     void Print(const char*);
@@ -87,15 +90,26 @@ public:
     void Print(unsigned int, int = DEC);
     void Print(long, int = DEC);
     void Print(unsigned long, int = DEC);
-    void Print(double, int = 2);
-    void Print(const Printable&);
+//    void Print(double, int = 2);	// This is not yet implemented
+//    void Print(const Printable&); // See comments in Display.cpp if you need this.
 
     void PrintLine(const char*); // TODO: Implement (all?) overloads for this
+    void ScrollUp(void);
+
+    void Refresh(void);
+
+protected:
+    void WriteBuffer(void);
+    void BlankRow(uint8_t);
 
 private:
-	LiquidCrystal* _lcd;
+
+	#ifndef LCD_IS_SERIAL		// If using Serial LCD, we don't need this
+		LiquidCrystal* _lcd;
+	#endif
 	uint8_t _currentRow;
-	char *_buffer;
+	uint8_t _currentColumn;
+	String _buffer[LCD_ROW_COUNT];
 };
 
 #endif /* DISPLAY_H_ */

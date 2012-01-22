@@ -31,10 +31,11 @@ SIZEDUMMY :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-. \
 Stepper \
+. \
 Servo \
 SPI \
+LiquidCrystal \
 Ethernet/utility \
 Ethernet \
 

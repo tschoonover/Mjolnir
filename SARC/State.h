@@ -14,8 +14,6 @@
 #define MAX_HISTORY 500
 #endif
 
-#ifndef STATE_C_
-
 using namespace MotorDefs;
 
 namespace SARC {
@@ -32,7 +30,7 @@ public:
 	bool isRightForward(void);
 	int getRightSpeed(void);
 	void setDuration(unsigned long duration);
-	int getDuration(void);
+	unsigned long getDuration(void);
 
 	// Returns the difference between left and right speeds as a signed long.
 	// We don't care what this value is, we only want the magnitude. This
@@ -40,17 +38,17 @@ public:
 	long getYaw(void);
 
 	// For equality, we only compare the direction and speed(s) - not duration.
-	bool operator==(State* state);
+	bool operator==(const State& state);
+
+	//const State& State::operator *(const State* state)
 
 private:
 	std::vector<State> _vector;
 	unsigned long _previousTick;
-
-//private:
-//	int direction;				// Assumed to be 0 - 360 (degrees)
-//	int leftSpeed;
-//	int rightSpeed;
-//	unsigned long duration;		// Probably length in ticks, but can be anything.
+	int _direction;				// Assumed to be 0 - 360 (degrees)
+	int _leftSpeed;
+	int _rightSpeed;
+	unsigned long _duration;
 };
 
 
@@ -64,14 +62,14 @@ class StateHistory
 	StateHistory(unsigned int);
 	unsigned int setHistorySize(unsigned int);
 
- private:
-	std::vector<State> _vector;
-
- public:
 	// Adds a State.
 	// @return: size_t The number of States in this history.
 	int AddState(const State& state);
 	state_reverse_iterator BacktrackIterator (unsigned int lastState=0);
+
+ private:
+	std::vector<State> _vector;
+	unsigned long _previousTick;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -94,7 +92,5 @@ class StateFactory
 };
 
 } // namespace SARC
-
-#endif // STATE_C_
 
 #endif // STATE_H_

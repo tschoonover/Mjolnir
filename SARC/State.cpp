@@ -24,7 +24,7 @@
 #include <iterator>
 #include <vector>
 //#include <map>
-#include <pnew.h>
+#include <pnew.cpp> // This is a little kludgy, but I've certainly done worse.
 
 #define STATE_C_
 #include "State.h"
@@ -49,62 +49,43 @@ namespace SARC {
  * updating the duration when two states are presented in the history that
  * have the same direction and speed.
  */
-class State {
+State::State(int new_direction = 0, unsigned long newDuration = 0, int new_leftSpeed =
+		MotorDefs::neutral , int new_rightSpeed = MotorDefs::neutral)
+{
+	this->_direction = new_direction;
+	this->_leftSpeed = new_leftSpeed;
+	this->_rightSpeed = new_rightSpeed;
+}
 
-public:
-	State(int new_direction = 0, unsigned long newDuration = 0, int new_leftSpeed =
-			MotorDefs::neutral , int new_rightSpeed = MotorDefs::neutral) {
-		this->_direction = new_direction;
-		this->_leftSpeed = new_leftSpeed;
-		this->_rightSpeed = new_rightSpeed;
-	}
+int State::getDirection(void)
+{
+	return this->_direction;
+}
 
-	int getDirection(void) {
-		return this->_direction;
-	}
+bool State::isLeftForward(void) {return this->_leftSpeed > MotorDefs::neutral;}
 
-	bool isLeftForward(void) {return this->_leftSpeed > MotorDefs::neutral;}
+int State::getLeftSpeed(void) {return this->_leftSpeed;}
 
-	int getLeftSpeed(void)
-	{
-		return this->_leftSpeed;
-	}
+bool State::isRightForward(void) {return this->_rightSpeed > MotorDefs::neutral;}
 
-	bool isRightForward(void) {return this->_rightSpeed > MotorDefs::neutral;}
+int State::getRightSpeed(void) {return this->_rightSpeed;}
 
-	int getRightSpeed(void) {
-		return this->_rightSpeed;
-	}
+void State::setDuration(unsigned long duration) {this->_duration = duration;}
 
-	void setDuration(unsigned long duration)
-	{
-		this->_duration = duration;
-	}
+unsigned long State::getDuration(void) {return this->_duration;}
 
-	unsigned long getDuration(void)
-	{
-		return this->_duration;
-	}
+// For equality, we only compare the _direction and speed(s) - not duration.
+bool State::operator==(const State& state)
+{
+	return state._direction == this->_direction
+			&& state._leftSpeed == this->_leftSpeed
+			&& state._rightSpeed == this->_rightSpeed;
+}
 
-	// For equality, we only compare the _direction and speed(s) - not duration.
-	bool operator==(const State* state)
-	{
-		return state->_direction == this->_direction
-				&& state->_leftSpeed == this->_leftSpeed
-				&& state->_rightSpeed == this->_rightSpeed;
-	}
-
-	const State& operator *(const State* state)
-	{
-		return *state;
-	}
-
-private:
-	int _direction;				// Assumed to be 0 - 360 (degrees)
-	int _leftSpeed;
-	int _rightSpeed;
-	unsigned long _duration;
-};
+//const State& State::operator *(const State* state)
+//{
+//	return *state;
+//}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -114,96 +95,86 @@ typedef std::vector<State>::reverse_iterator state_reverse_iterator;
  * @Class
  */
 
-class StateHistory
+
+StateHistory::StateHistory(unsigned int historySize=MAX_HISTORY)
 {
-private:
-	std::vector<State> _vector;
-	unsigned long _previousTick;
-
-public:
-
-	StateHistory(unsigned int historySize=MAX_HISTORY)
-	{
-		this->setHistorySize(historySize);
-	};
-
-	unsigned int setHistorySize(unsigned int historySize)
-	{
-		_vector.resize(historySize);
-		return _vector.size();
-	}
-
-	/*
-	 * Adds a State. This is done in an intelligent way by comparing the previous
-	 * state to the new one. If the States are different only by time, the
-	 * previous State is updated by adding the time (duration) of the two States.
-	 * The size of the wrapped vector is also managed. If the current size is >=
-	 * MAX_HISTORY, the oldest element is removed.
-	 * @param: state A reference to a state object.
-	 * @return: size_t The number of States in this history.
-	 */
- 	int AddState(const State& state)
- 	{
- 		unsigned long tickNow = micros();
- 		State prevState = _vector[_vector.size() - 1];
- 		if (prevState == &state)
- 		{
- 			prevState.setDuration( timeDifference(prevState.getDuration(), tickNow) );
- 		}
- 		else
- 		{
-			if (_vector.size() >= MAX_HISTORY)
-			{
-				_vector.erase(_vector.begin());
-			}
- 			prevState.setDuration(timeDifference(prevState.getDuration(), timeDifference(_previousTick, tickNow)));
- 			_vector.push_back(state);
- 		}
- 		_previousTick = tickNow;
- 		return _vector.size();
- 	}
-
-	state_reverse_iterator BacktrackIterator (unsigned int lastState=0)
-	{
-		return _vector.rbegin();
-	}
+	this->setHistorySize(historySize);
 };
+
+unsigned int StateHistory::setHistorySize(unsigned int historySize)
+{
+	_vector.resize(historySize);
+	return _vector.size();
+}
+
+/*
+ * Adds a State. This is done in an intelligent way by comparing the previous
+ * state to the new one. If the States are different only by time, the
+ * previous State is updated by adding the time (duration) of the two States.
+ * The size of the wrapped vector is also managed. If the current size is >=
+ * MAX_HISTORY, the oldest element is removed.
+ * @param: state A reference to a state object.
+ * @return: size_t The number of States in this history.
+ */
+int StateHistory::AddState(const State& state)
+{
+	unsigned long tickNow = micros();
+	State prevState = _vector[_vector.size() - 1];
+	if (prevState == state)
+	{
+		prevState.setDuration( timeDifference(prevState.getDuration(), tickNow) );
+	}
+	else
+	{
+		if (_vector.size() >= MAX_HISTORY)
+		{
+			_vector.erase(_vector.begin());
+		}
+		prevState.setDuration(timeDifference(prevState.getDuration(), timeDifference(_previousTick, tickNow)));
+		_vector.push_back(state);
+	}
+	_previousTick = tickNow;
+	return _vector.size();
+}
+
+state_reverse_iterator StateHistory::BacktrackIterator (unsigned int lastState)
+{
+	return _vector.rbegin();
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class StateFactory
+State* StateFactory::CopyState(State& stateSource)
 {
- public:
-	State* CopyState(State& stateSource)
-	{
-		return new State(stateSource.getDirection(), stateSource.getDuration(),
-						 stateSource.getLeftSpeed(), stateSource.getRightSpeed());
-	};
-	/*
-	 * Allocates and returns a new State that has the opposite _direction of the ref_state.
-	 *
-	 * This assumes:
-	 * 		neutral - (forward - neutral) = reverse
-	 * 		neutral + (neutral - reverse) = forward
-	 *
-	 * @See: MotorDefs.h
-	 */
-	State* Opposite_direction (State& ref_state)
-	{
-		int new_left_speed, new_right_speed;
-		new_left_speed =  (ref_state.isLeftForward())?
-				MotorDefs::neutral - (ref_state.getLeftSpeed() - MotorDefs::neutral) :
-				MotorDefs::neutral + (MotorDefs::neutral - ref_state.getLeftSpeed());
+	return new State(stateSource.getDirection(), stateSource.getDuration(),
+					 stateSource.getLeftSpeed(), stateSource.getRightSpeed());
+};
 
-		new_right_speed =  (ref_state.isRightForward())?
-				MotorDefs::neutral - (ref_state.getRightSpeed() - MotorDefs::neutral) :
-				MotorDefs::neutral + (MotorDefs::neutral - ref_state.getRightSpeed());
+/*
+ * Allocates and returns a new State that has the opposite _direction of the ref_state.
+ *
+ * This assumes:
+ * 		neutral - (forward - neutral) = reverse
+ * 		neutral + (neutral - reverse) = forward
+ *
+ * @See: MotorDefs.h
+ */
+State* StateFactory::OppositeDirection (State& ref_state)
+{
+	int new_left_speed, new_right_speed;
+	new_left_speed =  (ref_state.isLeftForward())?
+			MotorDefs::neutral - (ref_state.getLeftSpeed() - MotorDefs::neutral) :
+			MotorDefs::neutral + (MotorDefs::neutral - ref_state.getLeftSpeed());
 
-		return new State((ref_state.getDirection() + 180) % 360,
-						 ref_state.getDuration(),
-						 new_left_speed,
-						 new_right_speed);
-	};
+	new_right_speed =  (ref_state.isRightForward())?
+			MotorDefs::neutral - (ref_state.getRightSpeed() - MotorDefs::neutral) :
+			MotorDefs::neutral + (MotorDefs::neutral - ref_state.getRightSpeed());
+
+	return new State((ref_state.getDirection() + 180) % 360,
+					 ref_state.getDuration(),
+					 new_left_speed,
+					 new_right_speed);
 };
 
 } // namespace SARC

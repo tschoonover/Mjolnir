@@ -89,6 +89,11 @@
 			<locationURI>SARCEthernet/Ethernet</locationURI>
 		</link>
 		<link>
+			<name>LiquidCrystal</name>
+			<type>2</type>
+			<locationURI>SARCLiquidCrystal/LiquidCrystal</locationURI>
+		</link>
+		<link>
 			<name>SPI</name>
 			<type>2</type>
 			<locationURI>SARCSPI/SPI</locationURI>

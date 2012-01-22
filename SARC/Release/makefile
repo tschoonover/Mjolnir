@@ -11,6 +11,7 @@ RM := rm -rf
 -include Stepper/subdir.mk
 -include Servo/subdir.mk
 -include SPI/subdir.mk
+-include LiquidCrystal/subdir.mk
 -include Ethernet/utility/subdir.mk
 -include Ethernet/subdir.mk
 -include subdir.mk
@@ -69,7 +70,7 @@ all: SARC.elf secondary-outputs
 SARC.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: AVR C++ Linker'
-	avr-gcc -Os -Wl,--gc-sections  -L"D:\Documents and Settings\Leland\Workspaces\Mjolnir\Arduino_Uno/Release" -mmcu=atmega328p -o"SARC.elf" $(OBJS) $(USER_OBJS) $(LIBS) -lm
+	avr-gcc  -L"D:\Documents and Settings\Leland\Workspaces\Mjolnir\Arduino_Uno/Release" -mmcu=atmega328p --cref -s -Os -Wl,--gc-sections  -o"SARC.elf" $(OBJS) $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
 

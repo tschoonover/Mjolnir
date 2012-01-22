@@ -44,16 +44,12 @@
 //
 // Do not remove the include below
 #include "SARC.h"
-#include "State.cpp"	// TODO: This is a hack. Why won't avr-gcc link to .cpp files in the project?
-//#include "State.h"
+#include "State.h"
 #include "ArduinoUtils.h"
 
 #include "MotorDefs.h"
-//using namespace MotorDefs;
+#include "Display.h"
 #include <Arduino.h>
-#include <HardwareSerial.h>
-
-extern HardwareSerial Serial;
 
 /************ ROBOT COMMAND DEFINITIONS ************/
 #define CSTOP           'q'
@@ -88,22 +84,23 @@ unsigned long lastMoveTime;
 boolean isMoving = false;
 
 /************ History ************/
-SARC::StateHistory *stateHistory;
+SARC::StateHistory *stateHistory = NULL;
+
+Display *display = NULL;
 
 void setup()
 {
-	// init serial communication for debugging
-	Serial.begin(9600);
+	display = new Display();	// See Display.h for important settings!
 
 	*leftTrackServo = Servo();
 	*rightTrackServo = Servo();
 	// init servos
-	Serial.println("Initializing servos.");
+	display->PrintLine("Initializing servos.");
 	leftTrackServo->attach((int) PIN_LEFT_SERVO);
 	rightTrackServo->attach((int) PIN_RIGHT_SERVO);
 
 	// init ethernet shield
-	Serial.println("Initializing ethernet.");
+	display->PrintLine("Initializing ethernet.");
 	Ethernet.begin(mac, ip, gateway, subnet);
 	*server = EthernetServer(port);
 	server->begin();
@@ -127,12 +124,12 @@ void updateServos()
 	SARC::State* currentState = new SARC::State((int)0, (unsigned long)0, (int)leftTrackSpeed, (int)rightTrackSpeed);
 	stateHistory->AddState((const SARC::State&)*currentState);
 
-	Serial.print("Left Track = ");
-	Serial.println(leftTrackSpeed);
-	Serial.print("Right Track = ");
-	Serial.println(rightTrackSpeed);
-	Serial.print("isMoving = ");
-	Serial.println(isMoving, BIN);
+	display->Print("Left Track = ");
+	display->Print(leftTrackSpeed);
+	display->Print("Right Track = ");
+	display->Print(rightTrackSpeed);
+	display->Print("isMoving = ");
+	display->Print(isMoving, BIN);
 };
 
 void moveForward()
@@ -181,7 +178,7 @@ void stopMovement()
 void loop()
 {
 	// output debug info
-	Serial.println("Waiting for client...");
+	display->PrintLine("Waiting for client...");
 
 	// check for an incoming client
 	EthernetClient client = server->available();
@@ -190,7 +187,7 @@ void loop()
 	if (client) {
 
 		// output debug info
-		Serial.println("EthernetClient acquired...");
+		display->PrintLine("EthernetClient acquired...");
 
 		// echo valid commands to user
 		client.println("Movement commands:");
@@ -213,8 +210,8 @@ void loop()
 				char c = client.read();
 
 				// output debug info
-				Serial.print("Received command: ");
-				Serial.println(c);
+				display->Print("Received command: ");
+				display->Print(c);
 
 				// process command
 				switch (c) {
@@ -267,14 +264,14 @@ void loop()
 				// stop movement if movement time limit exceeded
 				if (isMoving) {
 					if (millis() - lastMoveTime >= MOVEMENT_TIMEOUT) {
-						Serial.println("Movement timeout.");
+						display->PrintLine("Movement timeout.");
 						stopMovement();
 					}
 				}
 			}
 		}
 
-		Serial.println("Connection terminated.");
+		display->PrintLine("Connection terminated.");
 		stopMovement();
 	}
 }

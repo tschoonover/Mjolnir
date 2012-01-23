@@ -23,8 +23,8 @@
 
 #include <iterator>
 #include <vector>
-//#include <map>
-#include <pnew.cpp>
+#include <map>
+//#include "pnew.cpp"
 
 #include "State.h"
 #include "MotorDefs.h"
@@ -87,22 +87,20 @@ bool State::operator==(const State& state)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-typedef std::vector<State>::reverse_iterator state_reverse_iterator;
-
 /*
  * @Class
  */
 
 
-StateHistory::StateHistory(unsigned int historySize=MAX_HISTORY)
+StateHistory::StateHistory(unsigned int historySize)
 {
-	this->setHistorySize(historySize);
+	this->SetHistorySize(historySize);
 };
 
-unsigned int StateHistory::setHistorySize(unsigned int historySize)
+unsigned int StateHistory::SetHistorySize(unsigned int historySize)
 {
-	_vector.resize(historySize);
-	return _vector.size();
+	this->_vector.resize(historySize);
+	return this->_vector.size();
 }
 
 /*
@@ -114,30 +112,30 @@ unsigned int StateHistory::setHistorySize(unsigned int historySize)
  * @param: state A reference to a state object.
  * @return: size_t The number of States in this history.
  */
-int StateHistory::AddState(const State& state)
+int StateHistory::AddState(State* state)
 {
 	unsigned long tickNow = micros();
-	State prevState = _vector[_vector.size() - 1];
-	if (prevState == state)
+	State *prevState = this->_vector[this->_vector.size() - 1];
+	if (*prevState == *state)
 	{
-		prevState.setDuration( timeDifference(prevState.getDuration(), tickNow) );
+		prevState->setDuration( timeDifference(prevState->getDuration(), tickNow) );
 	}
 	else
 	{
-		if (_vector.size() >= MAX_HISTORY)
+		if (this->_vector.size() >= MAX_HISTORY)
 		{
-			_vector.erase(_vector.begin());
+			this->_vector.erase(this->_vector.begin());
 		}
-		prevState.setDuration(timeDifference(prevState.getDuration(), timeDifference(_previousTick, tickNow)));
-		_vector.push_back(state);
+		prevState->setDuration(timeDifference(prevState->getDuration(), timeDifference(this->_previousTick, tickNow)));
+		this->_vector.push_back(state);
 	}
-	_previousTick = tickNow;
-	return _vector.size();
+	this->_previousTick = tickNow;
+	return this->_vector.size();
 }
 
 state_reverse_iterator StateHistory::BacktrackIterator (unsigned int lastState)
 {
-	return _vector.rbegin();
+	return this->_vector.rbegin();
 }
 
 

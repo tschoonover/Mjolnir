@@ -170,6 +170,9 @@ void Display::ScrollUp(void)
 
 void Display::PrintLine(const char* string)
 {
+	// Note that the "line feed" is done only if the *previous* print command
+	// incremented the row position. Otherwise, we'd always have a blank row
+	// at the bottom of the screen!
 	if (_currentRow < LCD_ROW_COUNT)
 		_currentRow += 1;
 	else
@@ -183,7 +186,14 @@ void Display::PrintLine(const char* string)
 	}
 }
 
-// Print implementations below this point
+void Display::PrintLine(const String &string)
+{
+	char sbuf[LCD_COLUMN_COUNT+1];
+	string.toCharArray(sbuf, LCD_COLUMN_COUNT, 0);
+	this->PrintLine(sbuf);
+}
+
+////// Print implementations below this point
 
 /*
  * Other overloads call this method.
@@ -197,7 +207,7 @@ void Display::Print(const String& string)
 
 	// Then output the string to the device.
 	#ifdef LCD_IS_SERIAL
-		char tempString[LCD_COLUMN_COUNT+1]="";
+		char tempString[LCD_COLUMN_COUNT+1];
 		string.toCharArray(tempString, LCD_COLUMN_COUNT, 0);
 		Serial.print(tempString);
 	#else

@@ -7,6 +7,8 @@
  * for Section9 (http://section9.choamco.com/)
  * By: Leland Green...     Email: aboogieman (_at_) gmail.com
  *     Odysseus            Email: odysseus@choamco.com
+ * (At least it was originally adapted from that. Those are only a few
+ * lines of what is becoming a complex system.)
  *
  * This file is free software; you can redistribute it and/or modify
  * it under the terms of either the GNU General Public License version 2
@@ -29,25 +31,19 @@
  * Also note that if this is on a robot, you need either WiFi or
  * a wireless router onboard so you can telnet to it. :)
  *
+ *** Please see ReadMe.txt for further information on using and building. ***
+ *
  * We (Section9) have built a working prototype. Initial version
  * includes a wireless router. The project is called Mjolnir.
  * See the Section9 URL above for blog updates and other plans.
- *
  */
 
-//#include <iterator>
-//#include <vector>
-//#include <map>
-//#include <pnew.h>
-//
-//#include <algorithm>
-//
 // Do not remove the include below
 #include "SARC.h"
 #include "State.h"
 #include "ArduinoUtils.h"
-
 #include "MotorDefs.h"
+#include "Motor.h"
 #include "Display.h"
 #include <Arduino.h>
 
@@ -63,10 +59,6 @@
 /************ ROBOT MOVEMENT DEFINITIONS ************/
 #define MOVEMENT_TIMEOUT 1000
 
-/************ PIN DEFINITIONS ************/
-#define PIN_LEFT_SERVO  2
-#define PIN_RIGHT_SERVO 3
-
 /************ ETHERNET SHIELD CONFIG ************/
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x00, 0x3B, 0xB2 }; // MAC address
 byte ip[] = { 192, 168, 1, 99 }; // IP address
@@ -75,29 +67,19 @@ byte subnet[] = { 255, 255, 255, 0 }; // Subnet mask
 unsigned int port = 23; // Port number (Telnet)
 EthernetServer *server;
 
-/************ SERVO CONFIG ************/
-Servo *leftTrackServo;
-Servo *rightTrackServo;
-int leftTrackSpeed = MotorDefs::neutral;
-int rightTrackSpeed = MotorDefs::neutral;
-unsigned long lastMoveTime;
-boolean isMoving = false;
-
 /************ History ************/
 SARC::StateHistory *stateHistory = NULL;
+unsigned long lastMoveTime;
 
+/************ Motors ************/
+SARC::Motor* motor = NULL;
+
+/************ Display ************/
 Display *display = NULL;
 
 void setup()
 {
 	display = new Display();	// See Display.h for important settings!
-
-	*leftTrackServo = Servo();
-	*rightTrackServo = Servo();
-	// init servos
-	display->PrintLine("Initializing servos.");
-	leftTrackServo->attach((int) PIN_LEFT_SERVO);
-	rightTrackServo->attach((int) PIN_RIGHT_SERVO);
 
 	// init ethernet shield
 	display->PrintLine("Init ethernet.");
@@ -105,74 +87,16 @@ void setup()
 	*server = EthernetServer(port);
 	server->begin();
 
-	// Initialize the hsistory
+	// Initialize the history
 	stateHistory = new SARC::StateHistory((unsigned int)MAX_HISTORY);
-}
 
-void updateServos()
-{
-	leftTrackServo->writeMicroseconds(leftTrackSpeed);
-	rightTrackServo->writeMicroseconds(rightTrackSpeed);
-	lastMoveTime = millis();
+#ifdef USE_SERVOS
+	motor = new SARC::Motor(PIN_LEFT_SERVO, PIN_RIGHT_SERVO);
+#endif
 
-	if ((leftTrackSpeed == MotorDefs::neutral) && (rightTrackSpeed == MotorDefs::neutral))
-		isMoving = false;
-	else
-		isMoving = true;
-
-	// TODO: Update state with optional current heading (using compass or GPS module(s)).
-	SARC::State* currentState = new SARC::State((int)0, (unsigned long)0, (int)leftTrackSpeed, (int)rightTrackSpeed);
-	stateHistory->AddState((const SARC::State&)*currentState);
-
-	display->Print("Left Track = ");
-	display->Print(leftTrackSpeed);
-	display->Print("Right Track = ");
-	display->Print(rightTrackSpeed);
-	display->Print("isMoving = ");
-	display->Print(isMoving, BIN);
-};
-
-void moveForward()
-{
-	leftTrackSpeed = min(MotorDefs::forward,
-			leftTrackSpeed + MotorDefs::delta);
-	rightTrackSpeed = min(MotorDefs::forward,
-			rightTrackSpeed + MotorDefs::delta);
-	updateServos();
-}
-
-void moveBackward()
-{
-	leftTrackSpeed = max(MotorDefs::reverse,
-			leftTrackSpeed - MotorDefs::delta);
-	rightTrackSpeed = max(MotorDefs::reverse,
-			rightTrackSpeed - MotorDefs::delta);
-	updateServos();
-}
-
-void turnLeft()
-{
-	leftTrackSpeed = max(MotorDefs::reverse,
-			leftTrackSpeed - MotorDefs::delta);
-	rightTrackSpeed = min(MotorDefs::forward,
-			rightTrackSpeed + MotorDefs::delta);
-	updateServos();
-}
-
-void turnRight()
-{
-	leftTrackSpeed = min(MotorDefs::forward,
-			leftTrackSpeed + MotorDefs::delta);
-	rightTrackSpeed = max(MotorDefs::reverse,
-			rightTrackSpeed - MotorDefs::delta);
-	updateServos();
-}
-
-void stopMovement()
-{
-	leftTrackSpeed = MotorDefs::neutral;
-	rightTrackSpeed = MotorDefs::neutral;
-	updateServos();
+#ifdef USE_DC_MOTORS
+	motor = new SARC::Motor(AF_MOTOR_LEFT, AF_MOTOR_RIGHT);
+#endif
 }
 
 void loop()
@@ -218,41 +142,37 @@ void loop()
 				{
 					case CSTOP:
 						client.println("Full Stop");
-						stopMovement();
+						motor->StopMovement();
 						break;
 
 					case CFORWARD:
 						client.println("Accelerating Forward.");
-						moveForward();
+						motor->MoveForward();
 						break;
 
 					case CREVERSE:
 						client.println("Accelerating backward.");
-						moveBackward();
+						motor->MoveReverse();
 						break;
 
 					case CLEFT:
 						client.println("Turning left.");
-						turnLeft();
+						motor->TurnLeft();
 						break;
 
 					case CRIGHT:
 						client.println("Turning right.");
-						turnRight();
+						motor->TurnRight();
 						break;
 
 					case CFORWARD_FULL:
 						client.println("Full speed ahead!");
-						leftTrackSpeed = MotorDefs::forward;
-						rightTrackSpeed = MotorDefs::forward;
-						updateServos();
+						motor->MoveForwardFullSpeed();
 						break;
 
 					case CREVERSE_FULL:
 						client.println("Full speed reverse!");
-						leftTrackSpeed = MotorDefs::reverse;
-						rightTrackSpeed = MotorDefs::reverse;
-						updateServos();
+						motor->MoveReverseFullSpeed();
 						break;
 
 					default:
@@ -264,17 +184,17 @@ void loop()
 		 else // no input from user to process
 			{
 				// stop movement if movement time limit exceeded
-				if (isMoving) {
+				if (motor->IsMoving()) {
 					if (millis() - lastMoveTime >= MOVEMENT_TIMEOUT) {
 						display->PrintLine("Movement timeout.");
-						stopMovement();
+						motor->StopMovement();
 					}
 				}
 			}
 		}
 
 		display->PrintLine("Connection terminated.");
-		stopMovement();
+		motor->StopMovement();
 	}
 }
 

@@ -3,10 +3,28 @@
 
 /*
  * You should define either USE_AF_MOTORS or USE_VEX_MOTORS, not both.
+ * Likewise, you should define either USE_SERVOS or USE_DC_MOTORS, not both
+ *
+ * Note that VEX implies that you're using servos and AFMotors imply DC motors.
+ * We are aware that this is not necessarily true, but during development, these
+ * were the only two prototypes that we had. If you'd like support for a different
+ * configuration, please email me (Leland): aboogieman (_at_) gmail.com.
+ * (I can't promise that I'll add support, but I will definitely consider it.)
  */
+//#include <Arduino.h> 		// Just needed for the #defines from AFMotor.h
 
+//#define USE_DC_MOTORS
 //#define USE_AF_MOTORS
+
+#define USE_SERVOS
 #define USE_VEX_MOTORS
+
+#ifdef USE_SERVOS
+#include <Servo.h>
+
+/************ PIN DEFINITIONS ************/
+#define PIN_LEFT_SERVO  2
+#define PIN_RIGHT_SERVO 3
 
 #ifdef USE_VEX_MOTORS
 /************ VEX MOTOR CONTROL DEFINITIONS ************/
@@ -40,15 +58,20 @@ namespace MotorDefs {
 		forward = VEX_FULL_FORWARD,
 		reverse = VEX_FULL_REVERSE,
 		speed = VEX_SPEED_DELTA,
-		delta = VEX_SPEED_DELTA
+		delta = VEX_SPEED_DELTA,
+		relative = 0
 	} ;
 
 } // namespace MotorDefs
 
 #endif // USE_VEX_MOTORS
 
+#endif // USE_SERVOS
+
+#ifdef USE_DC_MOTORS
 #ifdef USE_AF_MOTORS
 
+#include <AFMotor.h>
 /*
  * For Adafruit motor shield, I'm only supporting DC motors at this point.
  * (I will be happy to add support for others if you email me.)
@@ -72,9 +95,33 @@ namespace MotorDefs {
 // The following define which motor you want to use
 #define AF_MOTOR_LEFT		1
 #define AF_MOTOR_RIGHT		2
+/*
+ * Possibilities for speed are:
+ * MOTOR12_64KHZ = , MOTOR12_8KHZ, MOTOR12_2KHZ, or MOTOR12_1KHZ
+ * See http://www.ladyada.net/make/mshield/use.html for info.
+ */
 
+// MOTOR12_64KHZ , MOTOR12_8KHZ, MOTOR12_2KHZ, or MOTOR12_1KHZ
+#define AF_MOTOR_SPEED		0
+
+namespace MotorDefs {
+
+enum _MotorDefs
+	{
+		brake = 20,
+		neutral = 255,	// A bit kludgy for now, but allows unsigned ints. Actual value will be -255
+		forward = 510,	// so we can keep reverse relative for comparisons.
+		reverse = 0, 	// Note that for AFMotor, direction must be handled in Motor.cpp
+		speed = 10,
+		delta = 10,
+		relative = 255	// This is subtracted from the values for DC motors because of the way AFMotor works.
+	} ;
+
+} // namespace MotorDefs
 
 #endif // USE_AF_MOTORS
+
+#endif // USE_DC_MOTORS
 
 // General definitions to aid working with motor movements and deltas.
 // You may need to change, depending on how your motor "speeds" are defined.

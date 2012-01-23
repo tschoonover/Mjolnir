@@ -7,22 +7,28 @@ CPP_SRCS += \
 ../ArduinoUtils.cpp \
 ../Display.cpp \
 ../Display_test.cpp \
+../Motor.cpp \
 ../SARC.cpp \
-../State.cpp 
+../State.cpp \
+../pnew.cpp 
 
 OBJS += \
 ./ArduinoUtils.o \
 ./Display.o \
 ./Display_test.o \
+./Motor.o \
 ./SARC.o \
-./State.o 
+./State.o \
+./pnew.o 
 
 CPP_DEPS += \
 ./ArduinoUtils.d \
 ./Display.d \
 ./Display_test.d \
+./Motor.d \
 ./SARC.d \
-./State.d 
+./State.d \
+./pnew.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

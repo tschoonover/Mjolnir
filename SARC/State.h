@@ -8,7 +8,13 @@
 #ifndef STATE_H_
 #define STATE_H_
 
+#include <iterator>
 #include <vector>
+#include <map>
+#include <pnew.h>
+
+#include <algorithm>
+
 #include "MotorDefs.h"
 #ifndef MAX_HISTORY
 #define MAX_HISTORY 500
@@ -35,7 +41,7 @@ public:
 	// Returns the difference between left and right speeds as a signed long.
 	// We don't care what this value is, we only want the magnitude. This
 	// is used by the StateHistory class (below).
-	long getYaw(void); // TODO: Implement
+	//long getYaw(void); // TODO: Implement
 
 	// For equality, we only compare the direction and speed(s) - not duration.
 	bool operator==(const State& state);
@@ -43,7 +49,6 @@ public:
 	//const State& State::operator *(const State* state)
 
 private:
-	std::vector<State> _vector;
 	unsigned long _previousTick;
 	int _direction;				// Assumed to be 0 - 360 (degrees)
 	int _leftSpeed;
@@ -54,21 +59,21 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-typedef std::vector<State>::reverse_iterator state_reverse_iterator;
+typedef std::vector<State*>::reverse_iterator state_reverse_iterator;
 
 class StateHistory
 {
  public:
 	StateHistory(unsigned int);
-	unsigned int setHistorySize(unsigned int);
+	unsigned int SetHistorySize(unsigned int);
 
 	// Adds a State.
 	// @return: size_t The number of States in this history.
-	int AddState(const State& state);
-	state_reverse_iterator BacktrackIterator (unsigned int lastState=0);
+	int AddState(State* state);
+	state_reverse_iterator BacktrackIterator (unsigned int lastState);
 
  private:
-	std::vector<State> _vector;
+	std::vector<State*> _vector;
 	unsigned long _previousTick;
 };
 

@@ -93,7 +93,8 @@ public:
 //    void Print(double, int = 2);	// This is not yet implemented
 //    void Print(const Printable&); // See comments in Display.cpp if you need this.
 
-    void PrintLine(const char*); // TODO: Implement (all?) overloads for this
+    void PrintLine(const char*); 	// TODO: Implement (all?) overloads for this
+    void PrintLine(const String &);
     void ScrollUp(void);
 
     void Refresh(void);

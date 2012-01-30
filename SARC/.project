@@ -3,13 +3,16 @@
 	<name>SARC</name>
 	<comment></comment>
 	<projects>
-		<project>Arduino_Uno</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
 			<triggers>clean,full,incremental,</triggers>
 			<arguments>
+				<dictionary>
+					<key>?children?</key>
+					<value>?name?=outputEntries\|?children?=?name?=entry\\\\\\\|\\\|\||</value>
+				</dictionary>
 				<dictionary>
 					<key>?name?</key>
 					<value></value>
@@ -84,34 +87,39 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>AFMotor</name>
+			<name>ArduinoCore</name>
 			<type>2</type>
-			<locationURI>SARCAFMotor/AFMotor</locationURI>
+			<locationURI>$%7BARDUINO_CORE_PATH%7D</locationURI>
+		</link>
+		<link>
+			<name>ArduinoVariant</name>
+			<type>2</type>
+			<locationURI>$%7BARDUINO_VARIANT_PATH%7D</locationURI>
 		</link>
 		<link>
 			<name>Ethernet</name>
 			<type>2</type>
-			<locationURI>SARCEthernet/Ethernet</locationURI>
+			<locationURI>$%7BARDUINO_LIBRARIES_PATH%7D/Ethernet</locationURI>
 		</link>
 		<link>
 			<name>LiquidCrystal</name>
 			<type>2</type>
-			<locationURI>SARCLiquidCrystal/LiquidCrystal</locationURI>
+			<locationURI>$%7BARDUINO_LIBRARIES_PATH%7D/LiquidCrystal</locationURI>
 		</link>
 		<link>
 			<name>SPI</name>
 			<type>2</type>
-			<locationURI>SARCSPI/SPI</locationURI>
+			<locationURI>$%7BARDUINO_LIBRARIES_PATH%7D/SPI</locationURI>
 		</link>
 		<link>
 			<name>Servo</name>
 			<type>2</type>
-			<locationURI>SARCServo/Servo</locationURI>
+			<locationURI>$%7BARDUINO_LIBRARIES_PATH%7D/Servo</locationURI>
 		</link>
 		<link>
 			<name>Stepper</name>
 			<type>2</type>
-			<locationURI>SARCStepper/Stepper</locationURI>
+			<locationURI>$%7BARDUINO_LIBRARIES_PATH%7D/Stepper</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

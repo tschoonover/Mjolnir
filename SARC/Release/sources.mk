@@ -38,5 +38,6 @@ SPI \
 LiquidCrystal \
 Ethernet/utility \
 Ethernet \
+ArduinoCore \
 AFMotor \
 

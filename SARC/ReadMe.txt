@@ -1,4 +1,4 @@
-SARC = Simple Arduino Robotic Control.							2012-01-12 
+SARC = Simple Arduino Robotic Control.	Version 1.0.0 Alpha			2012-02-06 
 
 This is specialized for a tank (tracked) drive with 2 motors.
 Copyright (c) 2011-2012 Leland Green... and Section9
@@ -26,7 +26,19 @@ quality, and some of the tools used to build it are very new technologies!
 --- Instructions ---
 
 This code is written to be used in Eclipse. To build it, you need the Arduino 
-Eclipse plug-in and the STL port for AVR. 
+Eclipse plug-in and the STL port for AVR.
+
+To actually *use* this code, you'll need a robot! :) Build instructions are
+available here: http://section9.choamco.com/mjolnir/
+The short summary of hardware we've tested with is:
+  * Arduino (Uno was used for testing)
+  * One of: 
+  		* Ethernet shield *or* 
+  		* 2 XBee devices (with appropriate shield) - one on the robot and
+  		  one on a PC. See XBee.txt for information about configuring the
+  		  XBee devices.
+  * For the client app, an Android device. Note that this does *not* work
+    with XBees. 
 
 I cannot support any of the following. If you have troubles with them, please
 contact their respective authors. 
@@ -89,14 +101,64 @@ contact their respective authors.
 6. Please support Arduino and open source hardware! See Section9 for links to
 	some of our favorite geek-sites.
 
-One other great open source tool is Eclipse EGit (Git for Eclipse):
+Another great open source tool is Eclipse EGit (Git for Eclipse):
   Eclipse EGit	1.1.0.201109151100-r	org.eclipse.egit.feature.group	Eclipse EGit
 This works great for accessing Git repositories directly from Eclipse.
 
+--- Building ---
+
+There are limited hardware changes supported in 1.0. See *.h for comments and
+details. These changes can be made with #define, or project properties -> 
+C/C++ Build -> Settings -> AVR C++ Compiler -> Settings -> Symbols.
+
+Most of these are plain enough, but here are some definitions you should know about:
+
+USE_ETHERNET - Sends/Receives control data via Ethernet Shield. (Or compatible.)
+USE_XBEE	 - If you use this, control data is sent over Serial. This was tested
+				with the SparkFun XBee Shield, but anything connected to the Serial
+				RX/TX will work. (You can remove the XBee Shield and control will
+				be via USB so you can test with any terminal.)
+USE_LCD		 - Prints informational messages to the LCD screen.
+LCD_IS_SERIAL - If you're using a serial LCD, you want this defined. If your LCD
+				is NOT serial (but you're using one), you'll need to change/refer
+				to the #defines in Display.h.
+				
+*** IMPORTANT NOTE *** Since XBee is only supported via RX/TX (Serial), this means
+	*** USE_XBEE and USE_LCD + LCD_IS_SERIAL are mutually exclusive. However, you 
+	*can* use both XBee and LCD if the LCD is non-serial (as most cheap ones are).
+	I.e., Define USE_XBEE and USE_LCD but *not* LCD_IS_SERIAL for this configuration.
+	
+	*** Likewise *** USE_ETHERNET and USE_XBEE are mutually exclusive. At this 
+	time we only support control via one or the other. (And only one client at 
+	a time. We tried connecting with more, but Arduino didn't like that. I 
+	don't anticipate much need for controlling via two methods.<g>)
+
+There are a lot of other definitions in the header files. These four are the main 
+ones for switching hardware. 
+
+To develop for SARC, the following Eclipse Workspace settings are required:
+
+1. Build Variable STL_INCLUDE_PATH. 
+	This variable should reference your local STL include path folder.
+
+2. Path Variable ARDUINO_CORE_PATH. 
+	This variable should reference your Arduino Core source folder. (The folder 
+	with Arduino.h in it).
+
+3. Path Variable ARDUINO_VARIANT_PATH. 
+	This variable should reference the folder with your board specific 
+	Arudino_Pins.h file.
+
+4. Path Variable ARDUINO_LIBRARIES_PATH. 
+	This variable should reference the folder where the non-core Arduino 
+	libraries are stored (Ethernet,Servo, SPI, etc.)
+
+--- Epilog ---
+
 While I cannot support this code, I do welcome questions and feedback. I'll 
 reply as I have time. I'm a busy software engineer in my day job, as is 
-Odysseus. But we'd like to share this project, so I hope to be updating this,
-and that will include new/updated instructions. 
+Odysseus. But we'd like to share this project, so we do plan to be updating 
+this project. Stay Tuned! 
 
 Thanks for you interest and I hope you enjoy the project as much as we do!
-Leland Green... 						January, 2012	Battlefield, MO USA
+Leland Green... 						February, 2012	Battlefield, MO USA

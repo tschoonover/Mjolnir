@@ -15,23 +15,23 @@
 #include "Display.h"
 #include <HardwareSerial.h>
 
-extern HardwareSerial Serial;
+#ifdef LCD_IS_SERIAL
+	extern HardwareSerial Serial;
+#endif
 
 Display::Display() {
 
 	// Allocate String objects to help us keep track of displayed text, allow scrolling, etc.
 	for (int j=0; j<LCD_ROW_COUNT; j++)
 	{
-		this->BlankRow(j);
+		BlankRow(j);
 	}
 
 	_currentRow = 0;
 	_currentColumn = 0;
 
 #ifdef LCD_IS_SERIAL
-
 	Serial.begin(9600); // Call this here and not in your code.
-
 #else // Not LCD_IS_SERIAL
 
 	// If anyone wants RW support, we should add it here.
@@ -123,21 +123,21 @@ void Display::Off(void)
  */
 void Display::WriteBuffer(void)
 {
-	//this->Clear(); // Would this cause flicker? (If called too often?)
+	//Clear(); // Would this cause flicker? (If called too often?)
 	for (int j=0; j<LCD_ROW_COUNT; j++)
 	{
 		for (unsigned int k=0; k<_buffer[j].length(); k++)
 		{
 			_buffer[j].concat(' ');
 		}
-		this->SetCursor(j, 0);
-		this->Print(_buffer[j]);
+		SetCursor(j, 0);
+		Print(_buffer[j]);
 	}
 }
 
 void Display::Refresh(void)
 {
-	this->WriteBuffer();
+	WriteBuffer();
 }
 
 /*
@@ -176,13 +176,13 @@ void Display::PrintLine(const char* string)
 	if (_currentRow < LCD_ROW_COUNT)
 		_currentRow += 1;
 	else
-		this->ScrollUp();
+		ScrollUp();
 
-	this->SetCursor(_currentRow, 0);
-	this->Print(string);
+	SetCursor(_currentRow, 0);
+	Print(string);
 	for (uint8_t n = strlen(string); n < LCD_COLUMN_COUNT; ++n)
 	{
-		this->Print(' ');
+		Print(' ');
 	}
 }
 
@@ -190,7 +190,7 @@ void Display::PrintLine(const String &string)
 {
 	char sbuf[LCD_COLUMN_COUNT+1];
 	string.toCharArray(sbuf, LCD_COLUMN_COUNT, 0);
-	this->PrintLine(sbuf);
+	PrintLine(sbuf);
 }
 
 ////// Print implementations below this point
@@ -218,49 +218,49 @@ void Display::Print(const String& string)
 void Display::Print(const char* string)
 {
 	String tempString(string);
-	this->Print(tempString);
+	Print(tempString);
 }
 
 void Display::Print(char ch)
 {
 	String tempString(ch);
-	this->Print(tempString);
+	Print(tempString);
 }
 
 void Display::Print(unsigned char ch, int format)
 {
 	String tempString(ch, format);
-	this->Print(tempString);
+	Print(tempString);
 }
 
 void Display::Print(int num, int format)
 {
 	String tempString(num, format);
-	this->Print(tempString);
+	Print(tempString);
 }
 
 void Display::Print(unsigned int num, int format)
 {
 	String tempString(num, format);
-	this->Print(tempString);
+	Print(tempString);
 }
 
 void Display::Print(long lnum, int format)
 {
 	String tempString(lnum, format);
-	this->Print(tempString);
+	Print(tempString);
 }
 
 void Display::Print(unsigned long lnum, int format)
 {
 	String tempString(lnum, format);
-	this->Print(tempString);
+	Print(tempString);
 }
 
 //void Display::Print(unsigned double dnum, unsigned int format)
 //{
 //	String tempString(dnum, format);
-//	this->Print(tempString);
+//	Print(tempString);
 //}
 
 // Warning: This is not implemented because it won't update the buffer. You're welcome

@@ -14,6 +14,7 @@
 
 #include <algorithm>
 
+#define VERSION "SARC 1.0.0a"
 
 #include <Ethernet.h>
 #include <Servo.h>

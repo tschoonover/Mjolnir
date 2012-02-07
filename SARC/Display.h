@@ -11,14 +11,14 @@
 #include "WString.h"
 #include "Print.h"
 
-#define USE_LCD
+//#define USE_LCD
 
 /* Use LCD_IS_SERIAL if you have a serial LCD. Right now, we only support this model:
  * 	http://www.jameco.com/webapp/wcs/stores/servlet/Product_10001_10001_2118686_-1
  * (Although, in theory, any model by that manufacturer will work.)
  * Just connect voltage, ground and the Arduino TX to your LCD RX.
  */
-#define LCD_IS_SERIAL
+//#define LCD_IS_SERIAL
 
 //#define LCD_USE_8_PINS	// Not sure why you'd want to do this, but we support it.
 //#define LCD_USE_RW		// RW mode is not supported at this time.

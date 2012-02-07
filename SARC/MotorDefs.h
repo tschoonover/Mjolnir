@@ -13,11 +13,11 @@
  */
 //#include <Arduino.h> 		// Just needed for the #defines from AFMotor.h
 
-//#define USE_DC_MOTORS
-//#define USE_AF_MOTORS
+#define USE_DC_MOTORS
+#define USE_AF_MOTORS
 
-#define USE_SERVOS
-#define USE_VEX_MOTORS
+//#define USE_SERVOS
+//#define USE_VEX_MOTORS
 
 #ifdef USE_SERVOS
 #include <Servo.h>
@@ -33,6 +33,7 @@
 #define VEX_NEUTRAL      1500
 #define VEX_FULL_REVERSE 1000
 #define VEX_SPEED_DELTA  10
+#define DELTA VEX_SPEED_DELTA
 
 #define SPEED_DELTA VEX_SPEED_DELTA
 
@@ -57,8 +58,6 @@ namespace MotorDefs {
 		neutral = VEX_NEUTRAL,
 		forward = VEX_FULL_FORWARD,
 		reverse = VEX_FULL_REVERSE,
-		speed = VEX_SPEED_DELTA,
-		delta = VEX_SPEED_DELTA,
 		relative = 0
 	} ;
 
@@ -92,32 +91,38 @@ namespace MotorDefs {
  *   Digital pin 10: Servo #2 control
  */
 
-// The following define which motor you want to use
-#define AF_MOTOR_LEFT		1
-#define AF_MOTOR_RIGHT		2
+// The following define which motor you want to use, 1-4.
+// I just happened to wire mine with motor 4 connected to the "left".
+// (Although, you could consider either one the "left", so it's just a POV.)
+#define AF_MOTOR_LEFT		4
+#define AF_MOTOR_RIGHT		3
+
+#define DELTA 50
+
 /*
- * Possibilities for speed are:
- * MOTOR12_64KHZ = , MOTOR12_8KHZ, MOTOR12_2KHZ, or MOTOR12_1KHZ
+ * Possibilities for speed for motors 1 & 2 (only) are:
+ * MOTOR12_64KHZ, MOTOR12_8KHZ, MOTOR12_2KHZ, or MOTOR12_1KHZ
  * See http://www.ladyada.net/make/mshield/use.html for info.
  */
-
-// MOTOR12_64KHZ , MOTOR12_8KHZ, MOTOR12_2KHZ, or MOTOR12_1KHZ
-#define AF_MOTOR_SPEED		0
+#define AF_MOTOR_SPEED		MOTOR12_1KHZ
 
 namespace MotorDefs {
 
 enum _MotorDefs
 	{
 		brake = 20,
-		neutral = 255,	// A bit kludgy for now, but allows unsigned ints. Actual value will be -255
-		forward = 510,	// so we can keep reverse relative for comparisons.
-		reverse = 0, 	// Note that for AFMotor, direction must be handled in Motor.cpp
-		speed = 10,
-		delta = 10,
-		relative = 255	// This is subtracted from the values for DC motors because of the way AFMotor works.
+		neutral = 256,	// A bit kludgey for now, but allows unsigned ints. Actual value will be -255
+		forward = 511,	// so we can keep reverse relative for comparisons.
+		reverse = 255, 	// Note that for AFMotor, direction must be handled in Motor.cpp
+		//speed = 10,
+		minimum = 0,	// The actual minimum value
+		maximum = 255,	// The actual maximum value
+		relative = 255
 	} ;
 
 } // namespace MotorDefs
+
+#define SPEED_CEILING 256
 
 #endif // USE_AF_MOTORS
 

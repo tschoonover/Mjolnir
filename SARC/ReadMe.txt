@@ -1,5 +1,8 @@
 SARC = Simple Arduino Robotic Control.	Version 1.0.0 Alpha			2012-02-06 
 
+The *controls* and connections are simple. The controls are similar to many 
+computer games. The code is becoming slightly complex. ;)
+
 This is specialized for a tank (tracked) drive with 2 motors.
 Copyright (c) 2011-2012 Leland Green... and Section9
 
@@ -122,6 +125,17 @@ USE_LCD		 - Prints informational messages to the LCD screen.
 LCD_IS_SERIAL - If you're using a serial LCD, you want this defined. If your LCD
 				is NOT serial (but you're using one), you'll need to change/refer
 				to the #defines in Display.h.
+USE_SERVOS	 - Use this or USE_DC_MOTORS. In our tests, this was used along with
+				USE_VEX_MOTORS.
+USE_VEX_MOTORS - Your motors are Vex Robotics servos. This requires USE_SERVOS, but
+				that does not require this one. (Although, if you have a different
+				type of servo, you'll need appropriate defines in MotorDefs.h.)
+USE_DC_MOTORS - This is mutually exclusive to USE_SERVOS. Use one or the other.
+USE_AF_MOTORS - Your DC motors are connected to an Adafruit motor shield. 
+				This was tested with USE_DC_MOTORS. Like the Vex definition above,
+				you could use DC motors without this, but you'd need to implement
+				extra code (if you don't use the AFMotor class).
+ 
 				
 *** IMPORTANT NOTE *** Since XBee is only supported via RX/TX (Serial), this means
 	*** USE_XBEE and USE_LCD + LCD_IS_SERIAL are mutually exclusive. However, you 

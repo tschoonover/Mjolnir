@@ -13,8 +13,8 @@
  */
 //#include <Arduino.h> 		// Just needed for the #defines from AFMotor.h
 
-#define USE_DC_MOTORS
-#define USE_AF_MOTORS
+//#define USE_DC_MOTORS
+//#define USE_AF_MOTORS
 
 //#define USE_SERVOS
 //#define USE_VEX_MOTORS
@@ -58,6 +58,7 @@ namespace MotorDefs {
 		neutral = VEX_NEUTRAL,
 		forward = VEX_FULL_FORWARD,
 		reverse = VEX_FULL_REVERSE,
+		minimum = VEX_FULL_REVERSE,
 		relative = 0
 	} ;
 

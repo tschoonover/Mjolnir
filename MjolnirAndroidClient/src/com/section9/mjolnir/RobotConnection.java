@@ -106,7 +106,6 @@ public class RobotConnection {
 				mRemoteSocket.close();
 			}
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
@@ -115,7 +114,6 @@ public class RobotConnection {
 			if (ListenerThread != null)
 				ListenerThread.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

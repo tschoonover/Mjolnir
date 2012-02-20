@@ -10,27 +10,43 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 public class RobotModel {
 	
+	// Constant definitions
+	private final String CAM_BASE_URL = "http://192.168.1.98/";
+	private final String CAM_AUTH_PARMS = "&user=admin&pwd=section9";
+	private final String NAV_IP = "192.168.1.99";
+	private final int NAV_PORT = 23;
+	
+	// Class members
 	private RobotConnection mNavConn;
 	private Timer mNavUpdateTimer;
 	private TimerTask mUpdateNavStateTask; 
 	private NavigationStates mNavigationState;
-	private boolean CameraIR;
-	private CameraMotionStates CameraMotionState;
-	HttpClient httpclient;
+	private boolean mCameraHQ;
+	private boolean mCameraIR;
+	private CameraMotionStates mCameraMotionState;
+	private HttpClient mHttpclient;
 	
+	/**
+	 * Constructor
+	 */
 	public RobotModel() {
 		initNavigation();
-		httpclient = new DefaultHttpClient();
+		mHttpclient = new DefaultHttpClient();
+	}
+	
+	public boolean getCameraHQ()
+	{
+		return mCameraHQ;
 	}
 	
 	public boolean getCameraIR()
 	{
-		return CameraIR;
+		return mCameraIR;
 	}
 	
 	public CameraMotionStates getCameraMotionState()
 	{
-		return CameraMotionState;
+		return mCameraMotionState;
 	}
 	
 	public synchronized NavigationStates getNavigationState() {
@@ -56,7 +72,7 @@ public class RobotModel {
 
 	public void StartNavSubsystem() throws IOException {
 		// Connect to subsystem.
-		mNavConn.connect("192.168.1.99", 23);
+		mNavConn.connect(NAV_IP, NAV_PORT);
 		
 		// Set initial navigation state.
 		setNavigationState(NavigationStates.Maintain);
@@ -78,98 +94,113 @@ public class RobotModel {
 	public void ExecuteCameraCommand(CameraCommands cmd) {
 		
 		// Build the URL command and update state.
-		String URL = "http://192.168.1.98/decoder_control.cgi?user=admin&pwd=section9&command=";
+		String URL = CAM_BASE_URL;
+		
+		// Append the camera function and parameters values.
 		switch (cmd)
 		{
 			case ActivateIR:
-				CameraIR = true;
-				URL += "95";
+				mCameraIR = true;
+				URL += "decoder_control.cgi?command=95";
 				break;
 				
 			case DeactivateIR:
-				CameraIR = false;
-				URL += "94";
+				mCameraIR = false;
+				URL += "decoder_control.cgi?command=94";
 				break;
 				
 			case ActivateVPatrol:
-				if (CameraMotionState == CameraMotionStates.PatrollingHorizontally || CameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically)
-					CameraMotionState = CameraMotionStates.PatrollingHorizontallyAndVertically;
+				if (mCameraMotionState == CameraMotionStates.PatrollingHorizontally || mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically)
+					mCameraMotionState = CameraMotionStates.PatrollingHorizontallyAndVertically;
 				else
-					CameraMotionState = CameraMotionStates.PatrollingVertically;
-				URL += "26";
+					mCameraMotionState = CameraMotionStates.PatrollingVertically;
+				URL += "decoder_control.cgi?command=26";
 				break;
 				
 			case DeactivateVPatrol:
-				if (CameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically || CameraMotionState == CameraMotionStates.PatrollingHorizontally)
-					CameraMotionState = CameraMotionStates.PatrollingHorizontally;
+				if (mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically || mCameraMotionState == CameraMotionStates.PatrollingHorizontally)
+					mCameraMotionState = CameraMotionStates.PatrollingHorizontally;
 				else
-					CameraMotionState = CameraMotionStates.NotMoving;
-				URL += "27";
+					mCameraMotionState = CameraMotionStates.NotMoving;
+				URL += "decoder_control.cgi?command=27";
 				break;
 				
 			case ActivateHPatrol:
-				if (CameraMotionState == CameraMotionStates.PatrollingVertically || CameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically)
-					CameraMotionState = CameraMotionStates.PatrollingHorizontallyAndVertically;
+				if (mCameraMotionState == CameraMotionStates.PatrollingVertically || mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically)
+					mCameraMotionState = CameraMotionStates.PatrollingHorizontallyAndVertically;
 				else
-					CameraMotionState = CameraMotionStates.PatrollingHorizontally;
-				URL += "28";
+					mCameraMotionState = CameraMotionStates.PatrollingHorizontally;
+				URL += "decoder_control.cgi?command=28";
 				break;
 				
 			case DeactivateHPatrol:
-				if (CameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically || CameraMotionState == CameraMotionStates.PatrollingVertically)
-					CameraMotionState = CameraMotionStates.PatrollingVertically;
+				if (mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically || mCameraMotionState == CameraMotionStates.PatrollingVertically)
+					mCameraMotionState = CameraMotionStates.PatrollingVertically;
 				else
-					CameraMotionState = CameraMotionStates.NotMoving;
-				URL += "29";
+					mCameraMotionState = CameraMotionStates.NotMoving;
+				URL += "decoder_control.cgi?command=29";
 				break;
 				
 			case PanRight: // Note Left and right are reversed on the device.
-				CameraMotionState = CameraMotionStates.PanningRight;
-				URL += "4";
+				mCameraMotionState = CameraMotionStates.PanningRight;
+				URL += "decoder_control.cgi?command=4";
 				break;
 				
 			case StopLeft: // Note Left and right are reversed on the device.
-				CameraMotionState = CameraMotionStates.NotMoving;
-				URL += "5";
+				mCameraMotionState = CameraMotionStates.NotMoving;
+				URL += "decoder_control.cgi?command=5";
 				break;
 				
 			case PanLeft: // Note Left and right are reversed on the device.
-				CameraMotionState = CameraMotionStates.PanningLeft;
-				URL += "6";
+				mCameraMotionState = CameraMotionStates.PanningLeft;
+				URL += "decoder_control.cgi?command=6";
 				break;
 				
 			case StopRight: // Note Left and right are reversed on the device.
-				CameraMotionState = CameraMotionStates.NotMoving;
-				URL += "7";
+				mCameraMotionState = CameraMotionStates.NotMoving;
+				URL += "decoder_control.cgi?command=7";
 				break;
 				
 			case PanUp:
-				CameraMotionState = CameraMotionStates.PanningUp;
-				URL += "0";
+				mCameraMotionState = CameraMotionStates.PanningUp;
+				URL += "decoder_control.cgi?command=0";
 				break;
 				
 			case StopUp:
-				CameraMotionState = CameraMotionStates.NotMoving;
-				URL += "1";
+				mCameraMotionState = CameraMotionStates.NotMoving;
+				URL += "decoder_control.cgi?command=1";
 				break;
 				
 			case PanDown:
-				CameraMotionState = CameraMotionStates.PanningDown;
-				URL += "2";
+				mCameraMotionState = CameraMotionStates.PanningDown;
+				URL += "decoder_control.cgi?command=2";
 				break;
 				
 			case StopDown:
-				CameraMotionState = CameraMotionStates.NotMoving;
-				URL += "3";
+				mCameraMotionState = CameraMotionStates.NotMoving;
+				URL += "decoder_control.cgi?command=3";
+				break;
+				
+			case ActivateHQ:
+				mCameraHQ = true;
+				URL += "camera_control.cgi?param=0&value=32";
+				break;
+				
+			case DeactivateHQ:
+				mCameraHQ = false;
+				URL += "camera_control.cgi?param=0&value=8";
 				break;
 				
 			default:
 				return;
 		}
 		
-		// Call the URL command.
+		// Append the authentication parameters.
+		URL += CAM_AUTH_PARMS;
+		
+		// Execute the HTTP command.
 		try {
-			httpclient.execute(new HttpGet(URL));
+			mHttpclient.execute(new HttpGet(URL));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -180,7 +211,8 @@ public class RobotModel {
 		Accelerate,
 		Decelerate,
 		TurnLeft,
-		TurnRight
+		TurnRight,
+		Stop
     }
 	
 	public enum CameraMotionStates {
@@ -208,7 +240,9 @@ public class RobotModel {
 		PanUp,
 		StopUp,
 		PanDown,
-		StopDown
+		StopDown,
+		ActivateHQ,
+		DeactivateHQ;
 	}
 	
 	private class UpdateNavStateTask extends TimerTask {
@@ -229,6 +263,9 @@ public class RobotModel {
 					case TurnRight:
 						mNavConn.send(new byte[] {'d'});
 						break;
+					case Stop:
+						mNavConn.send(new byte[] {'q'});
+						break;
 					default:
 						mNavConn.send(new byte[] {'m'});
 						break;
@@ -236,9 +273,6 @@ public class RobotModel {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-			// Reset navigation state.
-			setNavigationState(NavigationStates.Maintain);
 		}
 	}
 }

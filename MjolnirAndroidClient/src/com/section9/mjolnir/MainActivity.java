@@ -4,6 +4,8 @@ import com.section9.mjolnir.RobotModel.CameraCommands;
 import com.section9.mjolnir.RobotModel.NavigationStates;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,24 +39,18 @@ public class MainActivity extends Activity
 	{
 		// Attempt to open connection.
 		try {
-			mMjolnir.StartNavSubsystem();
+			mMjolnir.setVideoFrameReceivedListener(new VideoFrameReceivedListener());
+			mMjolnir.StartVideoSubsystem();
+			
+			//mMjolnir.StartNavSubsystem();
 		} catch (Exception e) {
 			Toast.makeText(this, "Unable to establish connection.", Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
 			return;
 		}
-		
-        // Init video streaming.
-        mMjolnirVideo = new MjpegView(this);
-        mMjolnirVideo.setSource(MjpegInputStream.read("http://192.168.1.98/videostream.cgi?user=admin&pwd=section9"));
-        mMjolnirVideo.setDisplayMode(MjpegView.SIZE_BEST_FIT);
-        mMjolnirVideo.showFps(true);
-        FrameLayout vf = (FrameLayout)findViewById(R.id.VideoFrame);
-        vf.removeAllViewsInLayout();
-        vf.addView(mMjolnirVideo);
-        
+
         // Init touch handling for the VideoFrame.
- 		vf.setOnTouchListener(new VideoFrameTouchListener());
+ 		((ImageView)findViewById(R.id.VideoFrame)).setOnTouchListener(new VideoFrameTouchListener());
  		
  		// Init touch handling for the DPad.
  		ImageView dpad = (ImageView)findViewById(R.id.DPadImage);
@@ -72,35 +68,30 @@ public class MainActivity extends Activity
 	 */
 	private void disconnect()
 	{
- 		// Disable Toggle Buttons.
+ 		// Disable toggle buttons.
  		((ToggleButton)findViewById(R.id.ToggleHQButton)).setEnabled(false);
  		((ToggleButton)findViewById(R.id.TogglePatrolButton)).setEnabled(false);
  		((ToggleButton)findViewById(R.id.ToggleIRButton)).setEnabled(false);
  		((ToggleButton)findViewById(R.id.ToggleDebugButton)).setEnabled(false);
  		
- 		// Reset Toggle Button State
+ 		// Reset toggle button states.
  		((ToggleButton)findViewById(R.id.ToggleHQButton)).setChecked(false);
  		((ToggleButton)findViewById(R.id.TogglePatrolButton)).setChecked(false);
  		((ToggleButton)findViewById(R.id.ToggleIRButton)).setChecked(false);
  		((ToggleButton)findViewById(R.id.ToggleDebugButton)).setChecked(false);
  		
- 		// Disable touch handling for Direction Pad.
+ 		// Disable touch handling for direction pad.
  		ImageView dpad = (ImageView)findViewById(R.id.DPadImage);
  		dpad.setOnTouchListener(null);
  		
- 		// Disable touch handling for IPCam.
- 		FrameLayout vf = (FrameLayout)findViewById(R.id.VideoFrame);
+ 		// Disable touch handling for the video frame.
+ 		ImageView vf = (ImageView)findViewById(R.id.VideoFrame);
  		vf.setOnTouchListener(null);
+ 		vf.setImageBitmap(null);
  		
- 		// Stop Video Streaming.
-		if (mMjolnirVideo != null)
-			mMjolnirVideo.stopPlayback();
-		
-		// Clear VideoFrame.
-		vf.removeAllViews();
-		
 		// Terminate robot connection.
 		mMjolnir.StopNavSubsystem();
+		mMjolnir.StopVideoSubsystem();
 	}
 	
     /**
@@ -340,6 +331,17 @@ public class MainActivity extends Activity
 				}
 			}
 			return true;
+		}
+	}
+	
+	private class VideoFrameReceivedListener implements MjpegDecodingListener.VideoFrameReceivedListener {
+		public void onVideoFrameReceived(final Bitmap bm) {
+			MainActivity.this.runOnUiThread(new Runnable() {
+				public void run() {
+					ImageView videoFrame = (ImageView)findViewById(R.id.VideoFrame);
+					videoFrame.setImageBitmap(bm);
+				}
+			});
 		}
 	}
 	

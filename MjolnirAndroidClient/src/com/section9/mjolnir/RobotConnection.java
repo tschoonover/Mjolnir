@@ -105,8 +105,8 @@ public class RobotConnection {
 				mRemoteSocket.shutdownOutput();
 				mRemoteSocket.close();
 			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 		// Wait for the listener thread to terminate.

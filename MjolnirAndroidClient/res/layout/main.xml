@@ -74,7 +74,7 @@
                     
     </LinearLayout>
     
-    <FrameLayout
+    <ImageView
         android:id="@+id/VideoFrame"
         android:layout_width="0dp"
         android:layout_height="fill_parent"

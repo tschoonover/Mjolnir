@@ -4,19 +4,24 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-public class RobotModel {
+public class RobotModel
+{
 	
-	// Constant definitions
+	// Camera definitions.
 	private final String CAM_BASE_URL = "http://192.168.1.98/";
 	private final String CAM_AUTH_PARMS = "&user=admin&pwd=section9";
+	private final String CAM_VIDEO_STEAM = "/videostream.cgi?";
+	private final String CAM_EXEC_COMMAND = "decoder_control.cgi?"; 
+	private final String CAM_SET_MODE = "camera_control.cgi?";
+	
+	
 	private final String NAV_IP = "192.168.1.99";
 	private final int NAV_PORT = 23;
+	private final String VID_IP = "192.168.1.98";
+	private final int VID_PORT = 80;
 	
 	// Class members
+	private MjpegDecodingListener mMjpegDecodingListener;
 	private RobotConnection mNavConn;
 	private Timer mNavUpdateTimer;
 	private TimerTask mUpdateNavStateTask; 
@@ -24,14 +29,25 @@ public class RobotModel {
 	private boolean mCameraHQ;
 	private boolean mCameraIR;
 	private CameraMotionStates mCameraMotionState;
-	private HttpClient mHttpclient;
+	private RobotConnection mVidConn;
+	private RobotConnection mVidControlConn;
 	
 	/**
 	 * Constructor
 	 */
-	public RobotModel() {
-		initNavigation();
-		mHttpclient = new DefaultHttpClient();
+	public RobotModel()
+	{
+		// Create connection object to the navigation subsystem.
+		mNavConn = new RobotConnection();
+		
+		// Create connection object to the video subsystem.
+		mVidConn = new RobotConnection();
+		
+		// Create connection object to the video motion subsystem.
+		mVidControlConn = new RobotConnection();
+		
+		// Create timer for triggering re-occurring navigation updates.
+		mNavUpdateTimer = new Timer();
 	}
 	
 	public boolean getCameraHQ()
@@ -49,29 +65,29 @@ public class RobotModel {
 		return mCameraMotionState;
 	}
 	
-	public synchronized NavigationStates getNavigationState() {
+	public synchronized NavigationStates getNavigationState()
+	{
 		return mNavigationState;
 	}
 	
-	public synchronized void setNavigationState(NavigationStates state) {
+	public String getVideoStreamRequest()
+	{
+		return "GET " + CAM_VIDEO_STEAM + CAM_AUTH_PARMS + " HTTP/1.1\r\nHost: " + VID_IP.toString() + "\r\n\r\n";
+	}
+	
+	public synchronized void setNavigationState(NavigationStates state)
+	{
 		mNavigationState = state;
 	}
 	
-	public void setDataReceivedListener(RobotConnection.DataReceivedListener listener) {
+	public void setDataReceivedListener(RobotConnection.DataReceivedListener listener)
+	{
 		mNavConn.setDataReceivedListener(listener);
 	}
-	
-	private void initNavigation() {
-		
-		// Create connection object.
-		mNavConn = new RobotConnection();
-		
-		// Create timer for triggering re-occurring navigation updates.
-		mNavUpdateTimer = new Timer();
-	}
 
-	public void StartNavSubsystem() throws IOException {
-		// Connect to subsystem.
+	public void StartNavSubsystem() throws IOException
+	{
+		// Connect to navigation subsystem.
 		mNavConn.connect(NAV_IP, NAV_PORT);
 		
 		// Set initial navigation state.
@@ -81,114 +97,155 @@ public class RobotModel {
 		mUpdateNavStateTask = new UpdateNavStateTask();
 		mNavUpdateTimer.schedule(mUpdateNavStateTask, 0, 500);
 	}
-	
-	public void StopNavSubsystem() {
+
+	public void StopNavSubsystem()
+	{
 		// Halt navigation transmissions.
 		if (mUpdateNavStateTask != null)
 			mUpdateNavStateTask.cancel();
 		
-		// Disconnect from subsystem.
+		// Disconnect from navigation subsystem.
 		mNavConn.disconnect();	
 	}
 	
-	public void ExecuteCameraCommand(CameraCommands cmd) {
+	public void StartVideoSubsystem() throws Exception
+	{
+		// Register to receive video subsystem data.
+		mMjpegDecodingListener = new MjpegDecodingListener();
+		mVidConn.setDataReceivedListener(mMjpegDecodingListener);
 		
-		// Build the URL command and update state.
+		// Connect to video subsystem.
+		mVidConn.connect(VID_IP, VID_PORT);
+		mVidConn.sendAsync(getVideoStreamRequest().getBytes("UTF8"));
+		
+		// Connect to the video control subsystem.
+//		mVidControlConn.connect(VID_IP, VID_PORT);
+		
+		// Set initial video states.
+//		ExecuteCameraCommand(CameraCommands.DeactivateHQ);
+//		ExecuteCameraCommand(CameraCommands.DeactivateIR);
+//		ExecuteCameraCommand(CameraCommands.StopUp);
+	}
+
+	public void StopVideoSubsystem()
+	{
+		// Disconnect from the video subsystem.
+		mVidConn.disconnect();
+		
+		// disconnect from the video control subsystem.
+//		mVidControlConn.disconnect();
+	}
+
+	public void ExecuteCameraCommand(CameraCommands cmd)
+	{
+		// Build the command URL. 
 		String URL = CAM_BASE_URL;
 		
-		// Append the camera function and parameters values.
+		// Append the command and parameter(s).
 		switch (cmd)
 		{
 			case ActivateIR:
 				mCameraIR = true;
-				URL += "decoder_control.cgi?command=95";
+				URL += CAM_EXEC_COMMAND + "command=95";
 				break;
 				
 			case DeactivateIR:
 				mCameraIR = false;
-				URL += "decoder_control.cgi?command=94";
+				URL += CAM_EXEC_COMMAND + "command=94";
 				break;
 				
 			case ActivateVPatrol:
-				if (mCameraMotionState == CameraMotionStates.PatrollingHorizontally || mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically)
+				if (mCameraMotionState == CameraMotionStates.PatrollingHorizontally
+					|| mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically)
+				{
 					mCameraMotionState = CameraMotionStates.PatrollingHorizontallyAndVertically;
+				}
 				else
 					mCameraMotionState = CameraMotionStates.PatrollingVertically;
-				URL += "decoder_control.cgi?command=26";
+				URL += CAM_EXEC_COMMAND + "command=26";
 				break;
 				
 			case DeactivateVPatrol:
-				if (mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically || mCameraMotionState == CameraMotionStates.PatrollingHorizontally)
+				if (mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically
+					|| mCameraMotionState == CameraMotionStates.PatrollingHorizontally)
+				{
 					mCameraMotionState = CameraMotionStates.PatrollingHorizontally;
+				}
 				else
 					mCameraMotionState = CameraMotionStates.NotMoving;
-				URL += "decoder_control.cgi?command=27";
+				URL += CAM_EXEC_COMMAND + "command=27";
 				break;
 				
 			case ActivateHPatrol:
-				if (mCameraMotionState == CameraMotionStates.PatrollingVertically || mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically)
+				if (mCameraMotionState == CameraMotionStates.PatrollingVertically
+					|| mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically)
+				{
 					mCameraMotionState = CameraMotionStates.PatrollingHorizontallyAndVertically;
+				}
 				else
 					mCameraMotionState = CameraMotionStates.PatrollingHorizontally;
-				URL += "decoder_control.cgi?command=28";
+				URL += CAM_EXEC_COMMAND + "command=28";
 				break;
 				
 			case DeactivateHPatrol:
-				if (mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically || mCameraMotionState == CameraMotionStates.PatrollingVertically)
+				if (mCameraMotionState == CameraMotionStates.PatrollingHorizontallyAndVertically
+					|| mCameraMotionState == CameraMotionStates.PatrollingVertically)
+				{
 					mCameraMotionState = CameraMotionStates.PatrollingVertically;
+				}
 				else
 					mCameraMotionState = CameraMotionStates.NotMoving;
-				URL += "decoder_control.cgi?command=29";
+				URL += CAM_EXEC_COMMAND + "command=29";
 				break;
 				
 			case PanRight: // Note Left and right are reversed on the device.
 				mCameraMotionState = CameraMotionStates.PanningRight;
-				URL += "decoder_control.cgi?command=4";
+				URL += CAM_EXEC_COMMAND + "command=4";
 				break;
 				
 			case StopLeft: // Note Left and right are reversed on the device.
 				mCameraMotionState = CameraMotionStates.NotMoving;
-				URL += "decoder_control.cgi?command=5";
+				URL += CAM_EXEC_COMMAND + "command=5";
 				break;
 				
 			case PanLeft: // Note Left and right are reversed on the device.
 				mCameraMotionState = CameraMotionStates.PanningLeft;
-				URL += "decoder_control.cgi?command=6";
+				URL += CAM_EXEC_COMMAND + "command=6";
 				break;
 				
 			case StopRight: // Note Left and right are reversed on the device.
 				mCameraMotionState = CameraMotionStates.NotMoving;
-				URL += "decoder_control.cgi?command=7";
+				URL += CAM_EXEC_COMMAND + "command=7";
 				break;
 				
 			case PanUp:
 				mCameraMotionState = CameraMotionStates.PanningUp;
-				URL += "decoder_control.cgi?command=0";
+				URL += CAM_EXEC_COMMAND + "command=0";
 				break;
 				
 			case StopUp:
 				mCameraMotionState = CameraMotionStates.NotMoving;
-				URL += "decoder_control.cgi?command=1";
+				URL += CAM_EXEC_COMMAND + "command=1";
 				break;
 				
 			case PanDown:
 				mCameraMotionState = CameraMotionStates.PanningDown;
-				URL += "decoder_control.cgi?command=2";
+				URL += CAM_EXEC_COMMAND + "command=2";
 				break;
 				
 			case StopDown:
 				mCameraMotionState = CameraMotionStates.NotMoving;
-				URL += "decoder_control.cgi?command=3";
+				URL += CAM_EXEC_COMMAND + "command=3";
 				break;
 				
 			case ActivateHQ:
 				mCameraHQ = true;
-				URL += "camera_control.cgi?param=0&value=32";
+				URL += CAM_SET_MODE + "param=0&value=32";
 				break;
 				
 			case DeactivateHQ:
 				mCameraHQ = false;
-				URL += "camera_control.cgi?param=0&value=8";
+				URL += CAM_SET_MODE + "param=0&value=8";
 				break;
 				
 			default:
@@ -198,15 +255,17 @@ public class RobotModel {
 		// Append the authentication parameters.
 		URL += CAM_AUTH_PARMS;
 		
-		// Execute the HTTP command.
-		try {
-			mHttpclient.execute(new HttpGet(URL));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		// Execute the camera command as an HTTP GET request.
+		//mVidControlConn.sendAsync(buildHttpRequest().getBytes("UTF8"));
 	}
 	
-	public enum NavigationStates {
+	private String buildHttpRequest()
+	{
+		return "";
+	}
+	
+	public enum NavigationStates
+	{
 		Maintain,
 		Accelerate,
 		Decelerate,
@@ -215,7 +274,8 @@ public class RobotModel {
 		Stop
     }
 	
-	public enum CameraMotionStates {
+	public enum CameraMotionStates
+	{
 		NotMoving,
 		PanningUp,
 		PanningDown,
@@ -226,7 +286,8 @@ public class RobotModel {
 		PatrollingHorizontallyAndVertically
 	}
 	
-	public enum CameraCommands {
+	public enum CameraCommands
+	{
 		ActivateIR,
 		DeactivateIR,
 		ActivateVPatrol,
@@ -245,12 +306,21 @@ public class RobotModel {
 		DeactivateHQ;
 	}
 	
-	private class UpdateNavStateTask extends TimerTask {
+	/**
+	 * 
+	 * @author Odysseus
+	 *
+	 */
+	private class UpdateNavStateTask extends TimerTask
+	{
 		@Override
-		public void run() {
+		public void run()
+		{
 			// Attempt to transmit navigation state.
-			try {
-				switch (getNavigationState()) {
+			try
+			{
+				switch (getNavigationState())
+				{
 					case Accelerate:
 						mNavConn.send(new byte[] {'w'});
 						break;
@@ -270,9 +340,17 @@ public class RobotModel {
 						mNavConn.send(new byte[] {'m'});
 						break;
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 		}
+	}
+
+	
+	public void setVideoFrameReceivedListener(MjpegDecodingListener.VideoFrameReceivedListener videoFrameReceivedListener)
+	{
+		
 	}
 }

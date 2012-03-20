@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Properties;
 
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 
 class MjpegDecodingListener implements RobotConnection.DataReceivedListener
@@ -130,11 +131,11 @@ class MjpegDecodingListener implements RobotConnection.DataReceivedListener
 				}
 			}
 			
-			// If buffer contains all of the bytes for the current image...
+			// If buffer contains all of the bytes for the next image...
 			if (SOIPosition + imageSize <= bufferIndex)
 			{
-				// Decode image bytes into a bitmap.
-				Bitmap bm = BitmapFactory.decodeByteArray(buffer, SOIPosition, imageSize);
+				// Decode image bytes into a mutable bitmap.
+				Bitmap bm = BitmapFactory.decodeByteArray(buffer, SOIPosition, imageSize).copy(Config.ARGB_8888, true);
 				
 				// If there is any trailing data after the last image byte, use it to reinitialize the buffer.
 				int trailingDataStartPosition = SOIPosition + imageSize;
@@ -152,7 +153,7 @@ class MjpegDecodingListener implements RobotConnection.DataReceivedListener
 				}
 				
 				// Reset image size.
-				imageSize = -1;
+				imageSize = 0;
 			}
 			else
 			{

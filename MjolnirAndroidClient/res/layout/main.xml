@@ -82,7 +82,7 @@
         android:layout_marginRight="25dp"
         android:layout_weight="5"
         android:background="#000000"
-        android:scaleType="center" />
+        android:scaleType="fitXY" />
 
     <LinearLayout
         android:orientation="vertical"

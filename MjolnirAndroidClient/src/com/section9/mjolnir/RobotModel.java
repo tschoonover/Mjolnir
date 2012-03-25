@@ -1,7 +1,5 @@
 package com.section9.mjolnir;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,8 +23,8 @@ public class RobotModel
 	private boolean mCameraHQ;
 	private boolean mCameraIR;
 	private CameraMotionStates mCameraMotionState;
-	private RobotConnection mVidConn;
-	private RobotConnection mNavConn;
+	private VideoConnection mVidConn;
+	private NavigationConnection mNavConn;
 	
 	/**
 	 * Constructor
@@ -34,10 +32,10 @@ public class RobotModel
 	public RobotModel()
 	{
 		// Create connection object to the navigation subsystem.
-		mNavConn = new RobotConnection();
+		mNavConn = new NavigationConnection();
 		
 		// Create connection object to the video subsystem.
-		mVidConn = new RobotConnection();
+		mVidConn = new VideoConnection();
 
 		// Create timer for triggering re-occurring navigation updates.
 		mNavUpdateTimer = new Timer();
@@ -67,12 +65,17 @@ public class RobotModel
 	{
 		mNavigationState = state;
 	}
-	
-	public void setNavSubsystemListener(RobotConnection.DataReceivedListener listener)
-	{
-		mNavConn.setDataReceivedListener(listener);
-	}
 
+	public String[] getNavigationOutput()
+	{
+		return mNavConn.getHistory();
+	}
+	
+	public void setVideoFrameReceivedHandler(VideoConnection.VideoFrameReceivedListener listener)
+	{
+		mVidConn.setVideoFrameReceivedListener(listener);
+	}
+	
 	public void StartNavSubsystem(String ip, int port) throws Exception
 	{
 		// Save the connection information.
@@ -240,7 +243,7 @@ public class RobotModel
 		requestURI += CAM_AUTH_PARMS;
 		
 		// Execute the camera command as an HTTP GET request.
-		RobotConnection.SendAsyncAndClose(
+		RobotConnectionBase.sendAsyncAndClose(
 				mVidSubsystemIP,
 				mVidSubsystemPort,
 				buildHttpGetRequest(mVidSubsystemIP, requestURI).getBytes("UTF8")
@@ -335,14 +338,5 @@ public class RobotModel
 				e.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * 
-	 * @param listener
-	 */
-	public void setVideoSubsystemListener(RobotConnection.DataReceivedListener listener)
-	{
-		mVidConn.setDataReceivedListener(listener);
 	}
 }

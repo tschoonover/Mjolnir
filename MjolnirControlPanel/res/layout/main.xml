@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/background_gradient"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:padding="25dp" >
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ToggleButton
+            android:id="@+id/ToggleConnectionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="25dp"
+            android:textOff="Connect"
+            android:textOn="Disconnect"
+            android:onClick="ToggleConnectionButton_OnClick"/>
+        
+        <ToggleButton
+            android:id="@+id/ToggleHQButton"
+            android:textColor="@color/toggle_text_colorstatelist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:onClick="ToggleHQButton_OnClick"
+            android:textOff="HQ"
+            android:textOn="HQ" />
+
+        <ToggleButton
+            android:id="@+id/TogglePatrolButton"
+            android:textColor="@color/toggle_text_colorstatelist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:onClick="TogglePatrolButton_OnClick"
+            android:textOff="Patrol"
+            android:textOn="Patrol" />
+
+        <ToggleButton
+            android:id="@+id/ToggleIRButton"
+            android:textColor="@color/toggle_text_colorstatelist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:onClick="ToggleIRButton_OnClick"
+            android:textOff="IR"
+            android:textOn="IR" />
+        
+        <ToggleButton
+            android:id="@+id/ToggleDebugButton"
+            android:textColor="@color/toggle_text_colorstatelist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:onClick="ToggleDebugButton_OnClick"
+            android:layout_marginBottom="25dp"
+            android:textOff="Debug"
+            android:textOn="Debug" />
+
+        <Button
+            android:id="@+id/RewindHistoryButton"
+            android:textColor="@color/toggle_text_colorstatelist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Rewind" />
+                    
+    </LinearLayout>
+    
+    <ImageView
+        android:id="@+id/VideoFrame"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_weight="5"
+        android:background="#000000"
+        android:scaleType="fitXY" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3" >
+
+        <ImageView
+            android:id="@+id/LogoImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            
+            android:src="@drawable/section9_logo"/>
+        
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            
+            <ImageView
+                android:id="@+id/DPadImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:src="@drawable/dpad" />
+            
+        </FrameLayout>
+
+        
+    </LinearLayout>
+    
+</LinearLayout>

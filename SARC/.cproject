@@ -99,13 +99,11 @@
 									<listOptionValue builtIn="false" value="__IN_ECLIPSE__=1"/>
 									<listOptionValue builtIn="false" value="ARDUINO=${ARDUINO_IDE_VERSION}"/>
 									<listOptionValue builtIn="false" value="USE_ETHERNET"/>
-									<listOptionValue builtIn="false" value="NO_USE_XBEE"/>
 									<listOptionValue builtIn="false" value="USE_VEX_MOTORS"/>
+									<listOptionValue builtIn="false" value="DEBUG"/>
 									<listOptionValue builtIn="false" value="USE_LCD"/>
 									<listOptionValue builtIn="false" value="LCD_IS_SERIAL"/>
 									<listOptionValue builtIn="false" value="USE_SERVOS"/>
-									<listOptionValue builtIn="false" value="NO_USE_DC_MOTORS"/>
-									<listOptionValue builtIn="false" value="NO_USE_AF_MOTORS"/>
 								</option>
 								<option id="it.baeyens.avreclipse.cppcompiler.option.optimize.other.1963624562" name="Other Optimization Flags" superClass="it.baeyens.avreclipse.cppcompiler.option.optimize.other" value="-ffunction-sections -fdata-sections " valueType="string"/>
 								<option id="it.baeyens.avreclipse.cppcompiler.option.optimize.packstruct.144452329" name="Pack structs (-fpack-struct)" superClass="it.baeyens.avreclipse.cppcompiler.option.optimize.packstruct" value="false" valueType="boolean"/>

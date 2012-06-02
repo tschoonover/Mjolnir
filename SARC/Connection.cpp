@@ -14,10 +14,10 @@ namespace SARC {
 Connection::Connection()
 {
 	#ifdef USE_ETHERNET
-		_client = NULL;
 		Ethernet.begin(mac, ip, gateway, subnet);
 		_server = new EthernetServer(port);
 		_server->begin();
+		_client = _server->available();
 	#endif // USE_ETHERNET
 
 	#ifdef USE_XBEE
@@ -28,12 +28,11 @@ Connection::Connection()
 bool Connection::ClientIsConnected(void)
 {
 	#ifdef USE_ETHERNET
-		if (!_client)
+		if (!_client.connected())
 		{
 			_client = _server->available();
-			if (!_client) return false;
 		}
-		return _client.available();
+		return _client.connected();
 	#endif
 
 	#ifdef USE_XBEE

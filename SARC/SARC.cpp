@@ -189,21 +189,6 @@ void loop()
 				// read the next character from the input buffer
 				char c = connection->Read();
 
-				if (isdigit(c))
-				{
-					pch = tempBuf;
-					while (isdigit(c))
-					{
-						*pch++ = c;
-						c = connection->Read();
-					}
-					*pch = '\0';
-					delta = atoi(tempBuf);
-					#ifdef DEBUG
-						Serial.print("Set new delta = "); Serial.println(delta);
-					#endif
-				}
-
 				#ifdef USE_LCD
 					display->Print("Received command: ");
 					display->Print(c);

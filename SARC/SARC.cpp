@@ -197,11 +197,6 @@ void loop()
 					display->Print(c);
 				#endif
 
-				#ifdef USE_LCD
-					Serial.print("Received command: ");
-					Serial.println(c);
-				#endif
-
 				#ifdef DEBUG
 					Serial.print("Received command: ");
 					Serial.println(c);

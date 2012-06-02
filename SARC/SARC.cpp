@@ -26,6 +26,7 @@
  * a = Steer left
  * d = Steer Right
  * q = Stop (immediate)
+ * m = Maintain current speed
  *
  * Note that the PULSE definitions are for Vex Robotics systems.
  * Also note that if this is on a robot, you need either WiFi or
@@ -51,6 +52,7 @@
 //#define DEBUG
 
 /************ ROBOT COMMAND DEFINITIONS ************/
+#define CMAINTAIN		'm'
 #define CBRAKE			'b'
 #define CSTOP           'q'
 #define CFORWARD        'w'
@@ -143,6 +145,7 @@ void showUsage(SARC::Connection* connection)
 	// echo valid commands to user
 	connection->PrintLine("Movement commands:");
 	connection->PrintLine("------------------");
+	connection->PrintLine("Maintain - m");
 	connection->PrintLine("Brake - b");
 	connection->PrintLine("Stop (neutral) - q");
 	connection->PrintLine("Forward - w");
@@ -215,8 +218,13 @@ void loop()
 					case HELP:
 						showUsage(connection);
 						break;
+
+					case CMAINTAIN:
+						connection->PrintLine("Maintaining current speed.")
+						break;
+
 					case CSTOP:
-						connection->PrintLine("Full Stop");
+						connection->PrintLine("Full Stop.");
 						motor->StopMovement();
 						break;
 
@@ -261,7 +269,7 @@ void loop()
 						break;
 
 					case CBRAKE:
-						connection->PrintLine("Brake");
+						connection->PrintLine("Braking.");
 						motor->Brake();
 						break;
 

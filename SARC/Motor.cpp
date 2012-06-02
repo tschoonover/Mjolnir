@@ -45,7 +45,9 @@ Motor::Motor(unsigned int leftPin, unsigned int rightPin) {
 	_leftTrackServo = new Servo();
 	_rightTrackServo = new Servo();
 	// init servos
+#ifdef USE_LCD
 	display->PrintLine("Initializing servos.");
+#endif
 	_leftTrackServo->attach((int) leftPin);
 	_rightTrackServo->attach((int) rightPin);
 #endif // USE_SERVOS

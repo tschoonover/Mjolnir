@@ -215,7 +215,7 @@ void loop()
 						break;
 
 					case CMAINTAIN:
-						connection->PrintLine("Maintaining current speed.")
+						connection->PrintLine("Maintaining current speed.");
 						break;
 
 					case CSTOP:

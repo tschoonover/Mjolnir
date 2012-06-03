@@ -213,6 +213,7 @@ void loop()
 						break;
 
 					case CMAINTAIN:
+						lastMoveTime = millis();
 						connection->PrintLine("Maintaining current speed.");
 						break;
 

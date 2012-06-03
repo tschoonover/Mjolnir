@@ -162,7 +162,6 @@ void showUsage(SARC::Connection* connection)
 void loop()
 {
 	unsigned long ticksLastConnected = 0L;
-	bool printedDisconnected=true;
 	unsigned long millisNow = millis();	// This will be close enough for our purposes.
 
 #ifdef USE_LCD
@@ -184,7 +183,6 @@ void loop()
 		while (connection->ClientIsConnected())
 		{
 			millisNow = ticksLastConnected = millis();
-			printedDisconnected = false;
 
 			// check for user input
 			if (connection->ClientDataAvailable())

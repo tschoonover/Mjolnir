@@ -103,12 +103,10 @@ void setup()
 {
 	#ifdef USE_LCD
 		display = new Display();	// See Display.h for important settings!
-
 		display->PrintLine("Init Connection");
 	#endif
 
 	connection = new SARC::Connection();
-	connection->PrintLine((const char *)"Initializing...");
 
 	// Initialize the history
 	stateHistory = new SARC::StateHistory((unsigned int)10);

@@ -47,6 +47,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/Stepper}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/LiquidCrystal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${STL_INCLUDE_PATH}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/SoftwareSerial}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.avreclipse.tool.assembler.input.237159600" superClass="it.baeyens.avreclipse.tool.assembler.input"/>
 							</tool>
@@ -65,6 +66,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/LiquidCrystal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${STL_INCLUDE_PATH}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/AFMotor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/SoftwareSerial}&quot;"/>
 								</option>
 								<option id="it.baeyens.avreclipse.compiler.option.def.1485111403" name="Define Syms (-D)" superClass="it.baeyens.avreclipse.compiler.option.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__IN_ECLIPSE__=1"/>
@@ -94,6 +96,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/LiquidCrystal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${STL_INCLUDE_PATH}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/AFMotor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/SoftwareSerial}&quot;"/>
 								</option>
 								<option id="it.baeyens.avreclipse.cppcompiler.option.def.479432623" name="Define Syms (-D)" superClass="it.baeyens.avreclipse.cppcompiler.option.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__IN_ECLIPSE__=1"/>
@@ -176,7 +179,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="ArduinoVariant|ArduinoCore|SPI|Servo|Ethernet|Stepper|LiquidCrystal|AFMotor" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="SoftwareSerial|ArduinoVariant|ArduinoCore|SPI|Servo|Ethernet|Stepper|LiquidCrystal|AFMotor" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry excluding="?xamples/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Ethernet"/>
 						<entry excluding="?xamples/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Servo"/>
 						<entry excluding="?xamples/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="SPI"/>
@@ -185,6 +188,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="ArduinoCore"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="ArduinoVariant"/>
 						<entry excluding="?xamples/*" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="AFMotor"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="SoftwareSerial"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

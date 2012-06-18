@@ -13,10 +13,9 @@
  */
 
 #include "Display.h"
-#include <HardwareSerial.h>
 
 #ifdef LCD_IS_SERIAL
-	extern HardwareSerial Serial;
+	#include <SoftwareSerial.h>
 #endif
 
 Display::Display() {
@@ -31,7 +30,8 @@ Display::Display() {
 	_currentColumn = 0;
 
 #ifdef LCD_IS_SERIAL
-	Serial.begin(9600); // Call this here and not in your code.
+	_SerialLCD = new SoftwareSerial(4, 5);
+	_SerialLCD->begin(9600);
 #else // Not LCD_IS_SERIAL
 
 	// If anyone wants RW support, we should add it here.
@@ -62,7 +62,7 @@ void Display::SetCursor(uint8_t row, uint8_t col)
 			base=20;
 		else if (row == 4)
 			base=84;
-		Serial.write(base + col - 1);
+		_SerialLCD->write(base + col - 1);
 	#else
 		_lcd->setCursor(row, col);
 	#endif	// LCD_IS_SERIAL
@@ -72,8 +72,8 @@ void Display::SetCursor(uint8_t row, uint8_t col)
 void Display::Clear(void)
 {
 	#ifdef LCD_IS_SERIAL
-		Serial.write(0xFE);
-		Serial.write(0x51);
+		_SerialLCD->write(0xFE);
+		_SerialLCD->write(0x51);
 	#else
 		_lcd->clear();
 	#endif
@@ -82,8 +82,8 @@ void Display::Clear(void)
 void Display::Home(void)
 {
 	#ifdef LCD_IS_SERIAL
-		Serial.write(0xFE);
-		Serial.write(0x46);
+		_SerialLCD->write(0xFE);
+		_SerialLCD->write(0x46);
 	#else
 		_lcd->home();
 	#endif
@@ -92,8 +92,8 @@ void Display::Home(void)
 void Display::On(void)
 {
 	#ifdef LCD_IS_SERIAL
-		Serial.write(0xFE);
-		Serial.write(0x41);
+		_SerialLCD->write(0xFE);
+		_SerialLCD->write(0x41);
 	#else
 		_lcd->display();
 	#endif
@@ -102,21 +102,12 @@ void Display::On(void)
 void Display::Off(void)
 {
 	#ifdef LCD_IS_SERIAL
-		Serial.write(0xFE);
-		Serial.write(0x42);
+		_SerialLCD->write(0xFE);
+		_SerialLCD->write(0x42);
 	#else
 		_lcd->noDisplay();
 	#endif
 }
-
-// TODO:
-//void Display::AutoScroll(void)
-//{
-//	#ifdef LCD_IS_SERIAL
-//	#else
-//	#endif
-//}
-//
 
 /*
  * Writes the entire buffer, one row at a time.
@@ -209,7 +200,7 @@ void Display::Print(const String& string)
 	#ifdef LCD_IS_SERIAL
 		char tempString[LCD_COLUMN_COUNT+1];
 		string.toCharArray(tempString, LCD_COLUMN_COUNT, 0);
-		Serial.print(tempString);
+		_SerialLCD->print(tempString);
 	#else
 		_lcd->print(string);
 	#endif
@@ -256,21 +247,3 @@ void Display::Print(unsigned long lnum, int format)
 	String tempString(lnum, format);
 	Print(tempString);
 }
-
-//void Display::Print(unsigned double dnum, unsigned int format)
-//{
-//	String tempString(dnum, format);
-//	Print(tempString);
-//}
-
-// Warning: This is not implemented because it won't update the buffer. You're welcome
-// to use it, just so you're aware of that.
-//void Display::Print(const Printable& printable)
-//{
-//	#ifdef LCD_IS_SERIAL
-//		Serial.Print(printable);
-//	#else
-//		_lcd->Print(printable);
-//	#endif
-//}
-//

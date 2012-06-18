@@ -95,15 +95,13 @@ SARC::Connection* connection = NULL;
 #endif
 
 /************ Misc. global variables ************/
-char tempBuf[20];
-char *pch;
 unsigned int delta = DELTA;
 
 void setup()
 {
 	#ifdef USE_LCD
 		display = new Display();	// See Display.h for important settings!
-		display->PrintLine("Init Connection");
+		display->PrintLine("Init conn");
 	#endif
 
 	connection = new SARC::Connection();
@@ -125,16 +123,11 @@ void setup()
 
 	autoMoveExpires = 0;
 	inAutoMove = false;
-
-//	motor->MoveForwardFullSpeed();
-//	delay(1000);
-//	motor->MoveReverseFullSpeed();
-
 	delay(1000); 			// Give Serial a chance to init.
+
 #ifdef DEBUG
 	Serial.println("setup()");
 #endif
-	motor->StopMovement(); 	// Just in case the Arduino was reset.
 }
 
 void showUsage(SARC::Connection* connection)
@@ -177,7 +170,7 @@ void loop()
 
 		showUsage(connection);
 
-		// process user input as long as connection persits
+		// process user input as long as connection persists
 		while (connection->ClientIsConnected())
 		{
 			millisNow = ticksLastConnected = millis();

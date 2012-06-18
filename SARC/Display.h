@@ -25,6 +25,8 @@
 
 #ifdef LCD_IS_SERIAL
 
+#include <SoftwareSerial.h>
+
 #define LCD_RX_PIN 			0
 #define LCD_TX_PIN 			1		// You only need to set this, baud rate and row count.
 #define LCD_BAUD_RATE		9600
@@ -105,7 +107,9 @@ protected:
 
 private:
 
-	#ifndef LCD_IS_SERIAL		// If using Serial LCD, we don't need this
+	#ifdef LCD_IS_SERIAL
+    	SoftwareSerial* _SerialLCD;
+	#else
 		LiquidCrystal* _lcd;
 	#endif
 	uint8_t _currentRow;

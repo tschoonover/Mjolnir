@@ -100,11 +100,11 @@
 								</option>
 								<option id="it.baeyens.avreclipse.cppcompiler.option.def.479432623" name="Define Syms (-D)" superClass="it.baeyens.avreclipse.cppcompiler.option.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__IN_ECLIPSE__=1"/>
+									<listOptionValue builtIn="false" value="USE_LCD"/>
 									<listOptionValue builtIn="false" value="ARDUINO=${ARDUINO_IDE_VERSION}"/>
 									<listOptionValue builtIn="false" value="USE_ETHERNET"/>
 									<listOptionValue builtIn="false" value="USE_VEX_MOTORS"/>
 									<listOptionValue builtIn="false" value="DEBUG"/>
-									<listOptionValue builtIn="false" value="USE_LCD"/>
 									<listOptionValue builtIn="false" value="LCD_IS_SERIAL"/>
 									<listOptionValue builtIn="false" value="USE_SERVOS"/>
 								</option>

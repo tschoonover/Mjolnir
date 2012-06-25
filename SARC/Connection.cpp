@@ -85,7 +85,7 @@ size_t Connection::PrintLine(const char* string)
 }
 
 Connection::~Connection() {
-	// TODO Auto-generated destructor stub
+	delete _server;
 }
 
 } /* namespace SARC */

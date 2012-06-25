@@ -15,11 +15,6 @@
 #include <Arduino.h>
 #include "Motor.h"
 
-#ifdef USE_LCD
-	extern Display *display;
-#endif
-
-//#define DEBUG
 #ifdef DEBUG
 #include "HardwareSerial.h"
 	extern HardwareSerial Serial;
@@ -46,7 +41,7 @@ Motor::Motor(unsigned int leftPin, unsigned int rightPin) {
 	_rightTrackServo = new Servo();
 	// init servos
 #ifdef USE_LCD
-	display->PrintLine("Initializing servos.");
+//	display->PrintLine("Init servos.");
 #endif
 	_leftTrackServo->attach((int) leftPin);
 	_rightTrackServo->attach((int) rightPin);
@@ -56,31 +51,6 @@ Motor::Motor(unsigned int leftPin, unsigned int rightPin) {
 		_leftMotor = new AF_DCMotor(AF_MOTOR_LEFT, AF_MOTOR_SPEED);
 		_rightMotor = new AF_DCMotor(AF_MOTOR_RIGHT, AF_MOTOR_SPEED);
 	#endif //USE_DC_MOTORS
-}
-
-//static const char l1[] = "_leftActualSpeed = ";
-//static const char r1[] = "_rightActualSpeed = ";
-//
-//static const char l2[] = "_leftSpeed = ";
-//static const char r2[] = "_rightSpeed = ";
-/*
- * This is a debug routine.
- */
-void Motor::ShowSpeeds(void)
-{
-	Serial.print(" la = ");
-//	Serial.print(l1);
-	Serial.print(_leftActualSpeed);
-	Serial.print(", ra = ");
-//	Serial.print(r1);
-	Serial.println(_rightActualSpeed);
-
-	Serial.print(" ls = ");
-//	Serial.print(l2);
-	Serial.print(_leftSpeed);
-	Serial.print(", rs = ");
-//	Serial.print(r2);
-	Serial.println(_rightSpeed);
 }
 
 /*
@@ -107,7 +77,6 @@ void Motor::MoveRelative()
 {
 #ifdef DEBUG
 	Serial.print("MoveRelative() ");
-	ShowSpeeds();
 #endif
 	ValidateSpeeds();
 
@@ -128,7 +97,6 @@ void Motor::MoveRelative()
 
 #ifdef DEBUG
 	Serial.print("MoveRelative() (After Move) ");
-	ShowSpeeds();
 #endif
 }
 
@@ -161,7 +129,6 @@ void Motor::TurnLeft(unsigned int delta)
 	ValidateSpeeds();
 #ifdef DEBUG
 	Serial.print("TurnLeft "); Serial.println(delta);
-	ShowSpeeds();
 #endif
 	MoveRelative();
 }
@@ -179,7 +146,6 @@ void Motor::TurnRight(unsigned int delta)
 	ValidateSpeeds();
 #ifdef DEBUG
 	Serial.print("TurnRight "); Serial.println(delta);
-	ShowSpeeds();
 #endif
 	MoveRelative();
 }
@@ -352,7 +318,6 @@ void Motor::Move(void)
 {
 	#ifdef DEBUG
 		Serial.print("Move() ");
-		ShowSpeeds();
 	#endif
 
 	#ifdef USE_SERVOS
@@ -386,9 +351,9 @@ void Motor::Move(void)
 	stateHistory->AddState(*currentState);
 
 	#ifdef USE_LCD
-		display->PrintLine("Left Track = "); display->Print(_leftActualSpeed);
-		display->PrintLine("Right Track = "); display->Print(_rightActualSpeed);
-		display->PrintLine("isMoving = "); display->Print(_isMoving, BIN);
+//		display->PrintLine("Left Track = "); display->Print(String(_leftActualSpeed, DEC));
+//		display->PrintLine("Right Track = "); display->Print(String(_rightActualSpeed, DEC));
+//		display->PrintLine("isMoving = "); display->Print(String(_isMoving, BIN));
 	#endif // USE_LCD
 };
 

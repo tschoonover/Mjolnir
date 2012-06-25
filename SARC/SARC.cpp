@@ -64,7 +64,6 @@
 #define CREVERSE_FULL   'S'
 #define CLEFTFULL       'A'
 #define CRIGHTFULL      'D'
-#define HELP			'h'
 
 /************ ROBOT MOVEMENT DEFINITIONS ************/
 // If motors are moving and this many milliseconds pass, stop motors.
@@ -82,6 +81,7 @@ bool haveBacktrackIterator;
 bool inAutoMove;				// We're replaying history/moving automatically!
 unsigned long autoMoveExpires;	// The milliseconds that the current movement should be stopped.
 unsigned long previousTicks;	// The milliseconds for the previous call of loop().
+bool displayedWaitingMessage = false;
 
 /************ Motors ************/
 SARC::Motor* motor = NULL;
@@ -99,18 +99,47 @@ unsigned int delta = DELTA;
 
 void setup()
 {
+	#ifdef DEBUG
+		Serial.begin(9600);
+		delay(1000);
+		Serial.println("Entering setup().");
+	#endif
+
 	#ifdef USE_LCD
-		display = new Display();	// See Display.h for important settings!
-		display->PrintLine("Init conn");
+		display = new Display();
+		delay(1000);
+		display->Clear();
+		display->Home();
+		#ifdef DEBUG
+			Serial.println("LCD initialized.");
+		#endif
 	#endif
 
 	connection = new SARC::Connection();
+	#ifdef DEBUG
+		Serial.println("Communication initialized.");
+	#endif
+	#ifdef USE_LCD
+		display->PrintLine("Comm init'd.");
+	#endif
 
-	// Initialize the history
+	// Initialize the history.
 	stateHistory = new SARC::StateHistory((unsigned int)10);
+	#ifdef DEBUG
+		Serial.println("History initialized.");
+	#endif
+	#ifdef USE_LCD
+		display->PrintLine("History init'd.");
+	#endif
 
 	#ifdef USE_SERVOS
 		motor = new SARC::Motor(PIN_LEFT_SERVO, PIN_RIGHT_SERVO);
+		#ifdef DEBUG
+			Serial.println("Servos initialized.");
+		#endif
+		#ifdef USE_LCD
+			display->PrintLine("Servos init'd.");
+		#endif
 	#endif
 
 	#ifdef USE_DC_MOTORS
@@ -120,34 +149,12 @@ void setup()
 	#endif
 
 	haveBacktrackIterator = false;
-
 	autoMoveExpires = 0;
 	inAutoMove = false;
-	delay(1000); 			// Give Serial a chance to init.
 
 #ifdef DEBUG
-	Serial.println("setup()");
+	Serial.println("Entering loop().");
 #endif
-}
-
-void showUsage(SARC::Connection* connection)
-{
-	connection->PrintLine(VERSION);
-	// echo valid commands to user
-	connection->PrintLine("Movement commands:");
-	connection->PrintLine("------------------");
-	connection->PrintLine("Maintain - m");
-	connection->PrintLine("Brake - b");
-	connection->PrintLine("Stop (neutral) - q");
-	connection->PrintLine("Forward - w");
-	connection->PrintLine("Reverse - s");
-	connection->PrintLine("Left - a");
-	connection->PrintLine("Right - d");
-	connection->PrintLine("Full Forward - W");
-	connection->PrintLine("Full Reverse - S");
-	connection->PrintLine("Full Left - A");
-	connection->PrintLine("Full Right - D");
-	connection->PrintLine("Steer Center - c");
 }
 
 void loop()
@@ -155,20 +162,26 @@ void loop()
 	unsigned long ticksLastConnected = 0L;
 	unsigned long millisNow = millis();	// This will be close enough for our purposes.
 
-#ifdef USE_LCD
-	// output debug info to LCD screen
-	display->PrintLine("Waiting for client");
-#endif
+	#ifdef DEBUG
+		Serial.println("Waiting for client.");
+	#endif
+	#ifdef USE_LCD
+		if (!displayedWaitingMessage)
+		{
+			display->PrintLine("Waiting for client.");
+			displayedWaitingMessage = true;
+		}
+	#endif
 
 	// if client found, begin parsing robot control commands
 	if (connection->ClientIsConnected())
 	{
-		// output debug info
-		#ifdef USE_LCD
-			display->PrintLine("Net Client acquired");
+		#ifdef DEBUG
+			Serial.println("Client acquired.");
 		#endif
-
-		showUsage(connection);
+		#ifdef USE_LCD
+			display->PrintLine("Client acquired.");
+		#endif
 
 		// process user input as long as connection persists
 		while (connection->ClientIsConnected())
@@ -182,10 +195,9 @@ void loop()
 				char c = connection->Read();
 
 				#ifdef USE_LCD
-					display->Print("Received command: ");
-					display->Print(c);
+					display->Print("Recv'd command: ");
+					display->Print(String(c));
 				#endif
-
 				#ifdef DEBUG
 					Serial.print("Received command: ");
 					Serial.println(c);
@@ -199,10 +211,6 @@ void loop()
 				// Process command
 				switch (c)
 				{
-					case HELP:
-						showUsage(connection);
-						break;
-
 					case CMAINTAIN:
 						lastMoveTime = millis();
 						connection->PrintLine("Maintaining current speed.");
@@ -287,21 +295,20 @@ void loop()
 					}
 				}
 			}
-		} // while (connection->ClientIsConnected())
+		}
 
-		#ifdef USE_LCD
-			display->PrintLine("Connection terminated.");
-		#endif
 		#ifdef DEBUG
 			Serial.println("Connection terminated.");
 		#endif
+		#ifdef USE_LCD
+			display->PrintLine("Conn terminated.");
+		#endif
 		motor->StopMovement();
-
-	} // if (connection->ClientIsConnected())
+	}
 
 	/******* If we're here, we're not connected *******/
-
-	if (SARC::timeDifference(ticksLastConnected, millisNow) >= TIME_UNTIL_BACKTRACK)
+	if (false)
+//	if (SARC::timeDifference(ticksLastConnected, millisNow) >= TIME_UNTIL_BACKTRACK)
 	{
 		#ifdef DEBUG
 			Serial.println("Time until backtrack expired...");
@@ -358,5 +365,4 @@ void loop()
 		} // if (inAutoMove == false)
 	} 	// if (timeDifference(ticksLastConnected, millis()) >= TIME_UNTIL_BACKTRACK)
 	previousTicks = millisNow;
-}	// loop()
-
+}

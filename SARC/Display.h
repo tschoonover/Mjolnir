@@ -27,8 +27,8 @@
 
 #include <SoftwareSerial.h>
 
-#define LCD_RX_PIN 			0
-#define LCD_TX_PIN 			1		// You only need to set this, baud rate and row count.
+#define LCD_RX_PIN 			4
+#define LCD_TX_PIN 			5		// You only need to set this, baud rate and row count.
 #define LCD_BAUD_RATE		9600
 #define LCD_ROW_COUNT		4		// TODO: Implement a better way to handle this.
 #define LCD_COLUMN_COUNT	20
@@ -73,8 +73,11 @@
 /*
  * Encapsulation of display, for connecting an LCD.
  */
-class Display {
+class Display
+{
+
 public:
+
 	Display();
 
 	void Clear(void);
@@ -82,39 +85,27 @@ public:
 	void On(void);
 	void Off(void);
 	void SetCursor(uint8_t row, uint8_t col);
-//	void AutoScroll(void);	// TODO: Do we need this?
-
-    void Print(const String &);
-    void Print(const char*);
-    void Print(char);
-    void Print(unsigned char, int = DEC);
-    void Print(int, int = DEC);
-    void Print(unsigned int, int = DEC);
-    void Print(long, int = DEC);
-    void Print(unsigned long, int = DEC);
-//    void Print(double, int = 2);	// This is not yet implemented
-//    void Print(const Printable&); // See comments in Display.cpp if you need this.
-
-    void PrintLine(const char*); 	// TODO: Implement (all?) overloads for this
-    void PrintLine(const String &);
+    void Print(const String &text);
+    void PrintLine(const char *);
     void ScrollUp(void);
-
     void Refresh(void);
-
-protected:
-    void WriteBuffer(void);
-    void BlankRow(uint8_t);
 
 private:
 
+    uint8_t _currentRow;
+    uint8_t _currentColumn;
+
 	#ifdef LCD_IS_SERIAL
-    	SoftwareSerial* _SerialLCD;
-	#else
-		LiquidCrystal* _lcd;
-	#endif
-	uint8_t _currentRow;
-	uint8_t _currentColumn;
+	SoftwareSerial* _SerialLCD;
 	String _buffer[LCD_ROW_COUNT];
+	String _blankline;
+	void clearBuffer();
+
+	#else
+
+	LiquidCrystal* _lcd;
+
+	#endif
 };
 
 #endif /* DISPLAY_H_ */

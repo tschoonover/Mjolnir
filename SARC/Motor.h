@@ -34,7 +34,6 @@ public:
 	void Brake(void);
 	void SteerCenter(void);
 	bool IsMoving(void);
-	void ShowSpeeds(void);
 
 protected:
 	void Move(void);

@@ -34,7 +34,7 @@
 #include "Arduino.h"
 
 #ifndef MAX_HISTORY
-#define MAX_HISTORY 100
+#define MAX_HISTORY 5
 #endif
 
 

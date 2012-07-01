@@ -25,7 +25,7 @@
 
 #ifdef LCD_IS_SERIAL
 
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 
 #define LCD_RX_PIN 			4
 #define LCD_TX_PIN 			5		// You only need to set this, baud rate and row count.
@@ -87,6 +87,7 @@ public:
 	void SetCursor(uint8_t row, uint8_t col);
     void Print(const String &text);
     void PrintLine(const char *);
+    void PrintLine(const String &);
     void ScrollUp(void);
     void Refresh(void);
 
@@ -96,7 +97,7 @@ private:
     uint8_t _currentColumn;
 
 	#ifdef LCD_IS_SERIAL
-	SoftwareSerial* _SerialLCD;
+//	SoftwareSerial* _SerialLCD;
 	String _buffer[LCD_ROW_COUNT];
 	String _blankline;
 	void clearBuffer();

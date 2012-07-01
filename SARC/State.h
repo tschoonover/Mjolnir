@@ -17,7 +17,7 @@
 
 #include "MotorDefs.h"
 #ifndef MAX_HISTORY
-#define MAX_HISTORY 10
+#define MAX_HISTORY 2
 #endif
 
 using namespace MotorDefs;

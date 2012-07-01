@@ -16,7 +16,7 @@
 #include "WString.h"
 
 #ifdef LCD_IS_SERIAL
-	#include <SoftwareSerial.h>
+//	#include <SoftwareSerial.h>
 	#include <Arduino.h>
 #endif
 
@@ -27,8 +27,9 @@ Display::Display()
 
 #ifdef LCD_IS_SERIAL
 
-	_SerialLCD = new SoftwareSerial(LCD_RX_PIN, LCD_TX_PIN);
-	_SerialLCD->begin(9600);
+//	_SerialLCD = new SoftwareSerial(LCD_RX_PIN, LCD_TX_PIN);
+//	_SerialLCD->begin(9600);
+	Serial.begin(9600);
 
 	_blankline = String("");
 	for(int i = 0; i < LCD_COLUMN_COUNT; i++)
@@ -75,9 +76,12 @@ void Display::SetCursor(uint8_t row, uint8_t col)
 		else if (row == 3)
 			base=84;
 
-		_SerialLCD->write(0xFE);
-		_SerialLCD->write(0x45);
-		_SerialLCD->write(base + col);
+//		_SerialLCD->write(0xFE);
+//		_SerialLCD->write(0x45);
+//		_SerialLCD->write(base + col);
+		Serial.write(0xFE);
+		Serial.write(0x45);
+		Serial.write(base + col);
 
 	#else
 		_lcd->setCursor(row, col);
@@ -88,8 +92,10 @@ void Display::Clear(void)
 {
 	#ifdef LCD_IS_SERIAL
 		clearBuffer();
-		_SerialLCD->write(0xFE);
-		_SerialLCD->write(0x51);
+//		_SerialLCD->write(0xFE);
+//		_SerialLCD->write(0x51);
+		Serial.write(0xFE);
+		Serial.write(0x51);
 	#else
 		_lcd->clear();
 	#endif
@@ -98,8 +104,10 @@ void Display::Clear(void)
 void Display::Home(void)
 {
 	#ifdef LCD_IS_SERIAL
-		_SerialLCD->write(0xFE);
-		_SerialLCD->write(0x46);
+//		_SerialLCD->write(0xFE);
+//		_SerialLCD->write(0x46);
+		Serial.write(0xFE);
+		Serial.write(0x46);
 	#else
 		_lcd->home();
 	#endif
@@ -108,8 +116,10 @@ void Display::Home(void)
 void Display::On(void)
 {
 	#ifdef LCD_IS_SERIAL
-		_SerialLCD->write(0xFE);
-		_SerialLCD->write(0x41);
+//		_SerialLCD->write(0xFE);
+//		_SerialLCD->write(0x41);
+		Serial.write(0xFE);
+		Serial.write(0x46);
 	#else
 		_lcd->display();
 	#endif
@@ -118,8 +128,10 @@ void Display::On(void)
 void Display::Off(void)
 {
 	#ifdef LCD_IS_SERIAL
-		_SerialLCD->write(0xFE);
-		_SerialLCD->write(0x42);
+//		_SerialLCD->write(0xFE);
+//		_SerialLCD->write(0x42);
+		Serial.write(0xFE);
+		Serial.write(0x42);
 	#else
 		_lcd->noDisplay();
 	#endif
@@ -140,7 +152,8 @@ void Display::Refresh(void)
 	for (int row = 0; row < LCD_ROW_COUNT; row++)
 	{
 		SetCursor(row, 0);
-		_SerialLCD->print(_buffer[row]);
+//		_SerialLCD->print(_buffer[row]);
+		Serial.print(_buffer[row]);
 	}
 }
 
@@ -163,6 +176,13 @@ void Display::PrintLine(const char* text)
 	Print(paddedText);
 }
 
+void Display::PrintLine(const String &text)
+{
+	char buf[text.length() + 1];
+	text.toCharArray(buf, text.length(), 0);
+	PrintLine(buf);
+}
+
 void Display::Print(const String &text)
 {
 	// Crop text if necessary.
@@ -176,7 +196,8 @@ void Display::Print(const String &text)
 
 	// Output text to device.
 	#ifdef LCD_IS_SERIAL
-		_SerialLCD->print(croppedText);
+//		_SerialLCD->print(croppedText);
+		Serial.print(croppedText);
 	#else
 		_lcd->print(croppedText);
 	#endif

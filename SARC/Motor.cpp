@@ -21,7 +21,7 @@
 #endif // DEBUG
 
 extern unsigned long lastMoveTime;
-extern SARC::StateHistory *stateHistory;
+//extern SARC::StateHistory *stateHistory;
 
 namespace SARC {
 
@@ -75,9 +75,9 @@ void Motor::ValidateSpeeds()
  */
 void Motor::MoveRelative()
 {
-#ifdef DEBUG
-	Serial.print("MoveRelative() ");
-#endif
+//#ifdef DEBUG
+//	Serial.print("MoveRelative() ");
+//#endif
 	ValidateSpeeds();
 
 #ifdef USE_DC_MOTORS // This is only tested with USE_AF_MOTORS.
@@ -95,9 +95,9 @@ void Motor::MoveRelative()
 #endif
 	Move();
 
-#ifdef DEBUG
-	Serial.print("MoveRelative() (After Move) ");
-#endif
+//#ifdef DEBUG
+//	Serial.print("MoveRelative() (After Move) ");
+//#endif
 }
 
 /*
@@ -316,9 +316,9 @@ void Motor::MoveReverse(void)
  */
 void Motor::Move(void)
 {
-	#ifdef DEBUG
-		Serial.print("Move() ");
-	#endif
+//	#ifdef DEBUG
+//		Serial.print("Move() ");
+//	#endif
 
 	#ifdef USE_SERVOS
 		_leftTrackServo->writeMicroseconds(_leftActualSpeed);
@@ -347,8 +347,8 @@ void Motor::Move(void)
 	lastMoveTime = millis();
 
 	// TODO: Update state with optional current heading (using compass &/or GPS module(s)).
-	State* currentState = new SARC::State((unsigned int)0, (unsigned long)0, (unsigned int)_leftActualSpeed, (unsigned int)_rightActualSpeed);
-	stateHistory->AddState(*currentState);
+//	State* currentState = new SARC::State((unsigned int)0, (unsigned long)0, (unsigned int)_leftActualSpeed, (unsigned int)_rightActualSpeed);
+//	stateHistory->AddState(*currentState);
 
 	#ifdef USE_LCD
 //		display->PrintLine("Left Track = "); display->Print(String(_leftActualSpeed, DEC));

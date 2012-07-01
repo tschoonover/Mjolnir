@@ -104,7 +104,6 @@
 									<listOptionValue builtIn="false" value="ARDUINO=${ARDUINO_IDE_VERSION}"/>
 									<listOptionValue builtIn="false" value="USE_ETHERNET"/>
 									<listOptionValue builtIn="false" value="USE_VEX_MOTORS"/>
-									<listOptionValue builtIn="false" value="DEBUG"/>
 									<listOptionValue builtIn="false" value="LCD_IS_SERIAL"/>
 									<listOptionValue builtIn="false" value="USE_SERVOS"/>
 								</option>

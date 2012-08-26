@@ -47,6 +47,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/Stepper}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/LiquidCrystal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${STL_INCLUDE_PATH}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/SoftwareSerial}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.avreclipse.tool.assembler.input.237159600" superClass="it.baeyens.avreclipse.tool.assembler.input"/>
 							</tool>
@@ -65,6 +66,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/LiquidCrystal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${STL_INCLUDE_PATH}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/AFMotor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/SoftwareSerial}&quot;"/>
 								</option>
 								<option id="it.baeyens.avreclipse.compiler.option.def.1485111403" name="Define Syms (-D)" superClass="it.baeyens.avreclipse.compiler.option.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__IN_ECLIPSE__=1"/>
@@ -94,18 +96,16 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/LiquidCrystal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${STL_INCLUDE_PATH}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/AFMotor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SARC/SoftwareSerial}&quot;"/>
 								</option>
 								<option id="it.baeyens.avreclipse.cppcompiler.option.def.479432623" name="Define Syms (-D)" superClass="it.baeyens.avreclipse.cppcompiler.option.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__IN_ECLIPSE__=1"/>
+									<listOptionValue builtIn="false" value="USE_LCD"/>
 									<listOptionValue builtIn="false" value="ARDUINO=${ARDUINO_IDE_VERSION}"/>
 									<listOptionValue builtIn="false" value="USE_ETHERNET"/>
-									<listOptionValue builtIn="false" value="NO_USE_XBEE"/>
 									<listOptionValue builtIn="false" value="USE_VEX_MOTORS"/>
-									<listOptionValue builtIn="false" value="USE_LCD"/>
 									<listOptionValue builtIn="false" value="LCD_IS_SERIAL"/>
 									<listOptionValue builtIn="false" value="USE_SERVOS"/>
-									<listOptionValue builtIn="false" value="NO_USE_DC_MOTORS"/>
-									<listOptionValue builtIn="false" value="NO_USE_AF_MOTORS"/>
 								</option>
 								<option id="it.baeyens.avreclipse.cppcompiler.option.optimize.other.1963624562" name="Other Optimization Flags" superClass="it.baeyens.avreclipse.cppcompiler.option.optimize.other" value="-ffunction-sections -fdata-sections " valueType="string"/>
 								<option id="it.baeyens.avreclipse.cppcompiler.option.optimize.packstruct.144452329" name="Pack structs (-fpack-struct)" superClass="it.baeyens.avreclipse.cppcompiler.option.optimize.packstruct" value="false" valueType="boolean"/>
@@ -178,7 +178,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="ArduinoVariant|ArduinoCore|SPI|Servo|Ethernet|Stepper|LiquidCrystal|AFMotor" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="SoftwareSerial|ArduinoVariant|ArduinoCore|SPI|Servo|Ethernet|Stepper|LiquidCrystal|AFMotor" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry excluding="?xamples/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Ethernet"/>
 						<entry excluding="?xamples/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Servo"/>
 						<entry excluding="?xamples/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="SPI"/>
@@ -187,6 +187,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="ArduinoCore"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="ArduinoVariant"/>
 						<entry excluding="?xamples/*" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="AFMotor"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="SoftwareSerial"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -15,18 +15,13 @@
 #include <Arduino.h>
 #include "Motor.h"
 
-#ifdef USE_LCD
-	extern Display *display;
-#endif
-
-//#define DEBUG
 #ifdef DEBUG
 #include "HardwareSerial.h"
 	extern HardwareSerial Serial;
 #endif // DEBUG
 
 extern unsigned long lastMoveTime;
-extern SARC::StateHistory *stateHistory;
+//extern SARC::StateHistory *stateHistory;
 
 namespace SARC {
 
@@ -45,7 +40,9 @@ Motor::Motor(unsigned int leftPin, unsigned int rightPin) {
 	_leftTrackServo = new Servo();
 	_rightTrackServo = new Servo();
 	// init servos
-	display->PrintLine("Initializing servos.");
+#ifdef USE_LCD
+//	display->PrintLine("Init servos.");
+#endif
 	_leftTrackServo->attach((int) leftPin);
 	_rightTrackServo->attach((int) rightPin);
 #endif // USE_SERVOS
@@ -54,31 +51,6 @@ Motor::Motor(unsigned int leftPin, unsigned int rightPin) {
 		_leftMotor = new AF_DCMotor(AF_MOTOR_LEFT, AF_MOTOR_SPEED);
 		_rightMotor = new AF_DCMotor(AF_MOTOR_RIGHT, AF_MOTOR_SPEED);
 	#endif //USE_DC_MOTORS
-}
-
-//static const char l1[] = "_leftActualSpeed = ";
-//static const char r1[] = "_rightActualSpeed = ";
-//
-//static const char l2[] = "_leftSpeed = ";
-//static const char r2[] = "_rightSpeed = ";
-/*
- * This is a debug routine.
- */
-void Motor::ShowSpeeds(void)
-{
-	Serial.print(" la = ");
-//	Serial.print(l1);
-	Serial.print(_leftActualSpeed);
-	Serial.print(", ra = ");
-//	Serial.print(r1);
-	Serial.println(_rightActualSpeed);
-
-	Serial.print(" ls = ");
-//	Serial.print(l2);
-	Serial.print(_leftSpeed);
-	Serial.print(", rs = ");
-//	Serial.print(r2);
-	Serial.println(_rightSpeed);
 }
 
 /*
@@ -103,10 +75,9 @@ void Motor::ValidateSpeeds()
  */
 void Motor::MoveRelative()
 {
-#ifdef DEBUG
-	Serial.print("MoveRelative() ");
-	ShowSpeeds();
-#endif
+//#ifdef DEBUG
+//	Serial.print("MoveRelative() ");
+//#endif
 	ValidateSpeeds();
 
 #ifdef USE_DC_MOTORS // This is only tested with USE_AF_MOTORS.
@@ -124,10 +95,9 @@ void Motor::MoveRelative()
 #endif
 	Move();
 
-#ifdef DEBUG
-	Serial.print("MoveRelative() (After Move) ");
-	ShowSpeeds();
-#endif
+//#ifdef DEBUG
+//	Serial.print("MoveRelative() (After Move) ");
+//#endif
 }
 
 /*
@@ -159,7 +129,6 @@ void Motor::TurnLeft(unsigned int delta)
 	ValidateSpeeds();
 #ifdef DEBUG
 	Serial.print("TurnLeft "); Serial.println(delta);
-	ShowSpeeds();
 #endif
 	MoveRelative();
 }
@@ -177,7 +146,6 @@ void Motor::TurnRight(unsigned int delta)
 	ValidateSpeeds();
 #ifdef DEBUG
 	Serial.print("TurnRight "); Serial.println(delta);
-	ShowSpeeds();
 #endif
 	MoveRelative();
 }
@@ -348,10 +316,9 @@ void Motor::MoveReverse(void)
  */
 void Motor::Move(void)
 {
-	#ifdef DEBUG
-		Serial.print("Move() ");
-		ShowSpeeds();
-	#endif
+//	#ifdef DEBUG
+//		Serial.print("Move() ");
+//	#endif
 
 	#ifdef USE_SERVOS
 		_leftTrackServo->writeMicroseconds(_leftActualSpeed);
@@ -380,13 +347,13 @@ void Motor::Move(void)
 	lastMoveTime = millis();
 
 	// TODO: Update state with optional current heading (using compass &/or GPS module(s)).
-	State* currentState = new SARC::State((unsigned int)0, (unsigned long)0, (unsigned int)_leftActualSpeed, (unsigned int)_rightActualSpeed);
-	stateHistory->AddState(*currentState);
+//	State* currentState = new SARC::State((unsigned int)0, (unsigned long)0, (unsigned int)_leftActualSpeed, (unsigned int)_rightActualSpeed);
+//	stateHistory->AddState(*currentState);
 
 	#ifdef USE_LCD
-		display->PrintLine("Left Track = "); display->Print(_leftActualSpeed);
-		display->PrintLine("Right Track = "); display->Print(_rightActualSpeed);
-		display->PrintLine("isMoving = "); display->Print(_isMoving, BIN);
+//		display->PrintLine("Left Track = "); display->Print(String(_leftActualSpeed, DEC));
+//		display->PrintLine("Right Track = "); display->Print(String(_rightActualSpeed, DEC));
+//		display->PrintLine("isMoving = "); display->Print(String(_isMoving, BIN));
 	#endif // USE_LCD
 };
 

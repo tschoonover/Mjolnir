@@ -26,6 +26,7 @@
  * a = Steer left
  * d = Steer Right
  * q = Stop (immediate)
+ * m = Maintain current speed
  *
  * Note that the PULSE definitions are for Vex Robotics systems.
  * Also note that if this is on a robot, you need either WiFi or
@@ -40,7 +41,7 @@
 
 // Do not remove the include below
 #include "SARC.h"
-#include "State.h"
+//#include "State.h"
 #include "ArduinoUtils.h"
 #include "MotorDefs.h"
 #include "Motor.h"
@@ -51,6 +52,7 @@
 //#define DEBUG
 
 /************ ROBOT COMMAND DEFINITIONS ************/
+#define CMAINTAIN		'm'
 #define CBRAKE			'b'
 #define CSTOP           'q'
 #define CFORWARD        'w'
@@ -62,24 +64,25 @@
 #define CREVERSE_FULL   'S'
 #define CLEFTFULL       'A'
 #define CRIGHTFULL      'D'
-#define HELP			'h'
 
 /************ ROBOT MOVEMENT DEFINITIONS ************/
 // If motors are moving and this many milliseconds pass, stop motors.
 #define MOVEMENT_TIMEOUT 5000		// 5000 = 5 seconds
 
 // If client has been connected for this long (milliseconds), start backtracking to signal.
-#define TIME_UNTIL_BACKTRACK 30000	// 30000 = 30 seconds
+//#define TIME_UNTIL_BACKTRACK 3000	// 30000 = 30 seconds
 
 // TODO: Refactor to get rid of all global variables (or at least global class pointers).
 /************ History ************/
-SARC::StateHistory *stateHistory = NULL; // This is populated in Motor.cpp
+//SARC::StateHistory *stateHistory = NULL; // This is populated in Motor.cpp
 unsigned long lastMoveTime;
-SARC::state_reverse_iterator backtrackIterator;
-bool haveBacktrackIterator;
-bool inAutoMove;				// We're replaying history/moving automatically!
-unsigned long autoMoveExpires;	// The milliseconds that the current movement should be stopped.
-unsigned long previousTicks;	// The milliseconds for the previous call of loop().
+//SARC::state_reverse_iterator backtrackIterator;
+//bool haveBacktrackIterator;
+//bool inAutoMove;				// We're replaying history/moving automatically!
+//unsigned long autoMoveExpires;	// The milliseconds that the current movement should be stopped.
+//unsigned long previousTicks;	// The milliseconds for the previous call of loop().
+bool displayedWaitingMessage = false;
+//unsigned long ticksLastConnected = 0L;
 
 /************ Motors ************/
 SARC::Motor* motor = NULL;
@@ -93,95 +96,104 @@ SARC::Connection* connection = NULL;
 #endif
 
 /************ Misc. global variables ************/
-char tempBuf[20];
-char *pch;
 unsigned int delta = DELTA;
 
 void setup()
 {
-	#ifdef USE_LCD
-		display = new Display();	// See Display.h for important settings!
-
-		display->PrintLine("Init Connection");
+	#ifdef DEBUG
+		// Initialize serial communication for debug output.
+		Serial.begin(9600);
+		Serial.println("Entering setup().");
 	#endif
 
-	connection = new SARC::Connection();
-	connection->PrintLine((const char *)"Initializing...");
+	#ifdef USE_LCD
+		// Initialize LCD.
+		display = new Display();
+		delay(1000); // Pause to allow device to initialize.
+		display->Clear();
+		display->Home();
+		#ifdef DEBUG
+			Serial.println("LCD initialized.");
+		#endif
+	#endif
 
-	// Initialize the history
-	stateHistory = new SARC::StateHistory((unsigned int)10);
+	// Initialize connection.
+	connection = new SARC::Connection();
+	delay(1000); // Pause to allow device to initialize.
+	#ifdef DEBUG
+		Serial.println("Communication initialized.");
+	#endif
+	#ifdef USE_LCD
+		display->PrintLine("Comm init'd.");
+	#endif
+
+	// Initialize state history.
+//	stateHistory = new SARC::StateHistory((unsigned int)MAX_HISTORY);
+//	#ifdef DEBUG
+//		Serial.println("History initialized.");
+//	#endif
+//	#ifdef USE_LCD
+//		display->PrintLine("History init'd.");
+//	#endif
 
 	#ifdef USE_SERVOS
+		// Initialize VEX motors.
 		motor = new SARC::Motor(PIN_LEFT_SERVO, PIN_RIGHT_SERVO);
+		#ifdef DEBUG
+			Serial.println("Servos initialized.");
+		#endif
+		#ifdef USE_LCD
+			display->PrintLine("Servos init'd.");
+		#endif
 	#endif
 
 	#ifdef USE_DC_MOTORS
 	#ifdef USE_AF_MOTORS
+		// Initialize adafruit motors.
 		motor = new SARC::Motor(AF_MOTOR_LEFT, AF_MOTOR_RIGHT);
 	#endif
 	#endif
 
-	haveBacktrackIterator = false;
+	// Initialize backtrack control variables.
+//	haveBacktrackIterator = false;
+//	autoMoveExpires = 0;
+//	inAutoMove = false;
 
-	autoMoveExpires = 0;
-	inAutoMove = false;
-
-//	motor->MoveForwardFullSpeed();
-//	delay(1000);
-//	motor->MoveReverseFullSpeed();
-
-	delay(1000); 			// Give Serial a chance to init.
 #ifdef DEBUG
-	Serial.println("setup()");
+	Serial.println("Entering loop().");
 #endif
-	motor->StopMovement(); 	// Just in case the Arduino was reset.
-}
-
-void showUsage(SARC::Connection* connection)
-{
-	connection->PrintLine(VERSION);
-	// echo valid commands to user
-	connection->PrintLine("Movement commands:");
-	connection->PrintLine("------------------");
-	connection->PrintLine("Brake - b");
-	connection->PrintLine("Stop (neutral) - q");
-	connection->PrintLine("Forward - w");
-	connection->PrintLine("Reverse - s");
-	connection->PrintLine("Left - a");
-	connection->PrintLine("Right - d");
-	connection->PrintLine("Full Forward - W");
-	connection->PrintLine("Full Reverse - S");
-	connection->PrintLine("Full Left - A");
-	connection->PrintLine("Full Right - D");
-	connection->PrintLine("Steer Center - c");
 }
 
 void loop()
 {
-	unsigned long ticksLastConnected = 0L;
-	bool printedDisconnected=true;
 	unsigned long millisNow = millis();	// This will be close enough for our purposes.
 
-#ifdef USE_LCD
-	// output debug info to LCD screen
-	display->PrintLine("Waiting for client");
-#endif
+	if (!displayedWaitingMessage)
+	{
+		#ifdef DEBUG
+			Serial.println("Waiting for client.");
+		#endif
+		#ifdef USE_LCD
+				display->PrintLine("Waiting for client.");
+		#endif
+		displayedWaitingMessage = true;
+	}
 
 	// if client found, begin parsing robot control commands
 	if (connection->ClientIsConnected())
 	{
-		// output debug info
+		#ifdef DEBUG
+			Serial.println("Client acquired.");
+		#endif
 		#ifdef USE_LCD
-			display->PrintLine("Net Client acquired");
+			display->PrintLine("Client acquired.");
 		#endif
 
-		showUsage(connection);
-
-		// process user input as long as connection persits
+		// process user input as long as connection persists
 		while (connection->ClientIsConnected())
 		{
-			millisNow = ticksLastConnected = millis();
-			printedDisconnected = false;
+			millisNow = millis();
+//			ticksLastConnected = millisNow;
 
 			// check for user input
 			if (connection->ClientDataAvailable())
@@ -189,100 +201,110 @@ void loop()
 				// read the next character from the input buffer
 				char c = connection->Read();
 
-				if (isdigit(c))
-				{
-					pch = tempBuf;
-					while (isdigit(c))
-					{
-						*pch++ = c;
-						c = connection->Read();
-					}
-					*pch = '\0';
-					delta = atoi(tempBuf);
-					#ifdef DEBUG
-						Serial.print("Set new delta = "); Serial.println(delta);
-					#endif
-				}
-
-				#ifdef USE_LCD
-					display->Print("Received command: ");
-					display->Print(c);
-				#endif
-
-				#ifdef USE_LCD
-					Serial.print("Received command: ");
-					Serial.println(c);
-				#endif
-
 				#ifdef DEBUG
 					Serial.print("Received command: ");
 					Serial.println(c);
 				#endif
 
-				if (haveBacktrackIterator)
-				{
-					stateHistory->SetCurrent(backtrackIterator);
-				}
+//				if (haveBacktrackIterator)
+//				{
+//					stateHistory->SetCurrent(backtrackIterator);
+//				}
 
 				// Process command
 				switch (c)
 				{
-					case HELP:
-						showUsage(connection);
+					case CMAINTAIN:
+						lastMoveTime = millis();
+						connection->PrintLine("Maintaining current speed.");
 						break;
+
 					case CSTOP:
-						connection->PrintLine("Full Stop");
+						connection->PrintLine("Full Stop.");
 						motor->StopMovement();
+						#ifdef USE_LCD
+							display->PrintLine("Full Stop.");
+						#endif
 						break;
 
 					case CFORWARD:
-						connection->PrintLine("Accelerating Forward.");
+						connection->PrintLine("Accelerating.");
 						motor->AccelerateForward(delta);
+						#ifdef USE_LCD
+							display->PrintLine("Accelerating.");
+						#endif
 						break;
 
 					case CREVERSE:
-						connection->PrintLine("Accelerating backward.");
+						connection->PrintLine("Decelerating.");
 						motor->AccelerateReverse(delta);
+						#ifdef USE_LCD
+							display->PrintLine("Decelerating.");
+						#endif
 						break;
 
 					case CLEFT:
 						connection->PrintLine("Turning left.");
 						motor->TurnLeft(delta);
+						#ifdef USE_LCD
+							display->PrintLine("Turning left.");
+						#endif
 						break;
 
 					case CRIGHT:
 						connection->PrintLine("Turning right.");
 						motor->TurnRight(delta);
+						#ifdef USE_LCD
+							display->PrintLine("Turning right.");
+						#endif
 						break;
 
 					case CFORWARD_FULL:
-						connection->PrintLine("Full speed ahead!");
+						connection->PrintLine("Full forward.");
 						motor->MoveForwardFullSpeed();
+						#ifdef USE_LCD
+							display->PrintLine("Full forward.");
+						#endif
 						break;
 
 					case CREVERSE_FULL:
-						connection->PrintLine("Full speed reverse!");
+						connection->PrintLine("Full reverse.");
 						motor->MoveReverseFullSpeed();
+						#ifdef USE_LCD
+							display->PrintLine("Full reverse.");
+						#endif
 						break;
 
 					case CLEFTFULL:
-						connection->PrintLine("Turning left.");
+						connection->PrintLine("Full left.");
 						motor->TurnLeftFullSpeed();
+						#ifdef USE_LCD
+							display->PrintLine("Full left.");
+						#endif
 						break;
 
 					case CRIGHTFULL:
-						connection->PrintLine("Turning right.");
+						connection->PrintLine("Full right.");
 						motor->TurnRightFullSpeed();
+						#ifdef USE_LCD
+							display->PrintLine("Full right.");
+						#endif
 						break;
 
 					case CBRAKE:
-						connection->PrintLine("Brake");
+						connection->PrintLine("Braking.");
 						motor->Brake();
+						#ifdef USE_LCD
+							display->PrintLine("Braking.");
+						#endif
 						break;
 
 					case CSTEER_CENTER:
-						connection->PrintLine("Steer Center");
+						connection->PrintLine("Centering.");
 						motor->SteerCenter();
+						#ifdef USE_LCD
+							display->PrintLine("Centering.");
+						#endif
 						break;
 
 					default:
@@ -291,7 +313,7 @@ void loop()
 						break;
 				}
 			}
-		 else // no input from user to process
+			else // no input from user to process
 			{
 				// stop movement if movement time limit exceeded
 				if (motor->IsMoving()) {
@@ -309,76 +331,72 @@ void loop()
 					}
 				}
 			}
-		} // while (connection->ClientIsConnected())
+		}
 
-		#ifdef USE_LCD
-			display->PrintLine("Connection terminated.");
-		#endif
 		#ifdef DEBUG
 			Serial.println("Connection terminated.");
 		#endif
+		#ifdef USE_LCD
+			display->PrintLine("Conn terminated.");
+		#endif
 		motor->StopMovement();
-
-	} // if (connection->ClientIsConnected())
+	}
 
 	/******* If we're here, we're not connected *******/
-
-	if (SARC::timeDifference(ticksLastConnected, millisNow) >= TIME_UNTIL_BACKTRACK)
-	{
-		#ifdef DEBUG
-			Serial.println("Time until backtrack expired...");
-		#endif
-		if (inAutoMove == true)
-		{
-			if (SARC::timeDifference(previousTicks, millisNow) >= autoMoveExpires)
-			{
-				inAutoMove = false;
-				#ifdef DEBUG
-					Serial.println("AutoMove expired");
-				#endif
-			}
-		}
-		if (inAutoMove == false)
-		{
-			if (stateHistory->GetHistorySize() > 0)
-			{
-				/******* Return to sender :) *******/
-				if (haveBacktrackIterator == false)
-				{
-					#ifdef DEBUG
-						Serial.println("Initiating return to backtrack!");
-					#endif
-					backtrackIterator = stateHistory->BacktrackIterator(stateHistory->GetHistorySize());
-					haveBacktrackIterator = true;
-				}
-
-				backtrackIterator->CopyReverse(*backtrackIterator);
-
-				#ifdef DEBUG
-					Serial.println("Calling SetSpeeds() with speeds from history.");
-				#endif
-				motor->SetSpeeds(backtrackIterator->getLeftSpeed(), backtrackIterator->getRightSpeed());
-
-				if (backtrackIterator != stateHistory->BacktrackIteratorEnd())
-				{
-					++backtrackIterator; // It's a reverse iterator, so incrementing goes to previous one. ;)
-					autoMoveExpires = backtrackIterator->getDuration();
-					inAutoMove = true;
-				}
-				else
-				{
-					#ifdef DEBUG
-						Serial.println("backtrackIterator depleted.");
-					#endif
-					motor->StopMovement();
-				}
-			} // if (stateHistory->GetHistorySize() > 0)
-			else
-			{
-				motor->StopMovement();
-			}
-		} // if (inAutoMove == false)
-	} 	// if (timeDifference(ticksLastConnected, millis()) >= TIME_UNTIL_BACKTRACK)
-	previousTicks = millisNow;
-}	// loop()
-
+//	if (SARC::timeDifference(ticksLastConnected, millisNow) >= TIME_UNTIL_BACKTRACK)
+//	{
+//		if (inAutoMove == true)
+//		{
+//			Serial.print("automove time="); Serial.println(SARC::timeDifference(previousTicks, millisNow));
+//			if (SARC::timeDifference(previousTicks, millisNow) >= autoMoveExpires)
+//			{
+//				inAutoMove = false;
+//				#ifdef DEBUG
+//					Serial.println("AutoMove expired");
+//				#endif
+//			}
+//		}
+//		if (inAutoMove == false)
+//		{
+//			if (stateHistory->GetHistorySize() > 0)
+//			{
+//				/******* Return to sender :) *******/
+//				if (haveBacktrackIterator == false)
+//				{
+//					#ifdef DEBUG
+//						Serial.println("Initiating return to backtrack!");
+//					#endif
+//					backtrackIterator = stateHistory->BacktrackIterator(stateHistory->GetHistorySize());
+//					haveBacktrackIterator = true;
+//				}
+//
+//				backtrackIterator->CopyReverse(*backtrackIterator);
+//
+//				#ifdef DEBUG
+//					Serial.println("Calling SetSpeeds() with speeds from history.");
+//				#endif
+//				motor->SetSpeeds(backtrackIterator->getLeftSpeed(), backtrackIterator->getRightSpeed());
+//
+//				if (backtrackIterator != stateHistory->BacktrackIteratorEnd())
+//				{
+//					++backtrackIterator; // It's a reverse iterator, so incrementing goes to previous one. ;)
+//					autoMoveExpires = backtrackIterator->getDuration();
+//					inAutoMove = true;
+//					Serial.print("beginning automove for duration="); Serial.println(autoMoveExpires);
+//				}
+//				else
+//				{
+//					#ifdef DEBUG
+//						Serial.println("backtrackIterator depleted.");
+//					#endif
+//					motor->StopMovement();
+//				}
+//			} // if (stateHistory->GetHistorySize() > 0)
+//			else
+//			{
+//				motor->StopMovement();
+//			}
+//		} // if (inAutoMove == false)
+//	} 	// if (timeDifference(ticksLastConnected, millis()) >= TIME_UNTIL_BACKTRACK)
+//	previousTicks = millisNow;
+}

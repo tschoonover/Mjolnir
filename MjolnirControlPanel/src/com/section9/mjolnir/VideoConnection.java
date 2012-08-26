@@ -1,3 +1,22 @@
+/*  
+ *  This file is part of the Mjolnir Control Panel (MCP) program,
+ *  a client application for controlling the Mjolnir robot.
+ *  Copyright (C) 2012 Section9
+ *
+ *  MCP is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  MCP is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.section9.mjolnir;
 
 import java.io.ByteArrayInputStream;

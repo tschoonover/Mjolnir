@@ -1,14 +1,17 @@
-Mjolnir is a tank-like Arduino robot that supports wireless video streaming, navigation and camera control. The
-robot is operated using the following software components.
+Mjolnir is a tank-like Arduino robot that supports wireless video streaming, navigation
+and camera control. The robot is operated using the following software components.
 
-1) Simple Arduino Robot Control (SARC) - The robot operating system and supporting libraries. This
-   software runs on the robot's central microprocesser, and is responsible for TCP/IP connectivity,
-   command processing, LCD output, servo control, and navigation tracking. All source for this
-   component is located in the SARC directory.
+1) Simple Arduino Robot Control (SARC) - The robot operating system and
+   supporting libraries. This software runs on the robot's central
+   microprocesser, and is responsible for TCP/IP connectivity, command
+   processing, LCD output, servo control, and navigation tracking. All
+   source for this component is located in the SARC directory.
 
-2) Mjolnir Control Panel (MCP) - An Android client application that integrates video streaming,
-   camera control, navigation and debug output into a single user interface. Used to wireless operate
-   the robot. All source for this component is located in the MjolnirControlPanel directory.
+2) Mjolnir Control Panel (MCP) - An Android client application that
+   integrates video streaming, camera control, navigation and debug
+   output into a single user interface. Used to wireless operate the
+   robot. All source for this component is located in the
+   MjolnirControlPanel directory.
 
-For more information please see http://section9.choamco.com/mjolnir/ or contact Tim at odysseus@choamco.com
-or Leland at aboogieman@gmail.com.
+For more information please see http://section9.choamco.com/mjolnir/ or contact Tim at
+odysseus@choamco.com or Leland at aboogieman@gmail.com.

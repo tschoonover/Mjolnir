@@ -14,7 +14,7 @@ published by the Free Software Foundation.
 Written for Section9 (http://section9.choamco.com/) and 
 our future robotic overlords (http://singinst.org/)
   By: Leland Green...     Email: aboogieman (_at_) gmail.com
-      Odysseus            Email: odysseus@choamco.com
+      Odysseus            Email: odysseus.section9@gmail.com
 
 --- Disclaimer ---
 

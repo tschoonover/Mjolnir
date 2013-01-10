@@ -6,7 +6,7 @@
  * Adapted from Arduino Ethernet library example sketches
  * for Section9 (http://section9.choamco.com/)
  * By: Leland Green...     Email: aboogieman (_at_) gmail.com
- *     Odysseus            Email: odysseus@choamco.com
+ *     Odysseus            Email: odysseus.section9@gmail.com
  * (At least it was originally adapted from that. Those are only a few
  * lines of what is becoming a complex system.)
  *

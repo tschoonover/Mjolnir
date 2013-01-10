@@ -8,7 +8,7 @@
  *
  * Web site: Section9 (http://section9.choamco.com/)
  * By: Leland Green...     Email: aboogieman (_at_) gmail.com
- *     Odysseus            Email: odysseus@choamco.com
+ *     Odysseus            Email: odysseus.section9@gmail.com
  *
  * This file is free software; you can redistribute it and/or modify
  * it under the terms of either the GNU General Public License version 2
